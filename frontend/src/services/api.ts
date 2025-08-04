@@ -1,0 +1,645 @@
+import { 
+  User, 
+  Contract, 
+  Section, 
+  Tag, 
+  Context,
+  Company, 
+  LoginCredentials, 
+  CreateContractData, 
+  CreateSectionData, 
+  CreateTagData,
+  CreateContextData,
+  UpdateProfileData,
+  ContractsResponse,
+  GeneratedFile,
+  GeneratedFilesResponse
+} from '@/types';
+
+const BASE_URL = 'http://localhost:8000/api/'; // Placeholder para o backend
+
+// Simulação de token para desenvolvimento
+let authToken: string | null = localStorage.getItem('authToken');
+
+const api = {
+  setAuthToken: (token: string | null) => {
+    authToken = token;
+    if (token) {
+      localStorage.setItem('authToken', token);
+    } else {
+      localStorage.removeItem('authToken');
+    }
+  },
+
+  getAuthToken: () => authToken,
+
+  // async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+  //   console.log('API: Login attempt', credentials);
+    
+  //   // Simulação de delay de rede
+  //   await new Promise(resolve => setTimeout(resolve, 1000));
+    
+  //   if (credentials.email === 'admin@example.com' && credentials.password === 'password') {
+  //     const token = 'mock-jwt-token-' + Date.now();
+  //     const user: User = {
+  //       id: '1',
+  //       email: credentials.email,
+  //       name: 'Admin User',
+  //       avatar: undefined,
+  //       company: { id: '1', name: 'Empresa Exemplo' }
+  //     };
+      
+  //     this.setAuthToken(token);
+  //     return { user, token };
+  //   }
+    
+  //   throw new Error('Credenciais inválidas');
+  // },
+
+  async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao fazer login');
+      }
+
+      const data = await response.json();
+      
+      // Espera-se que sua API retorne { user, token }
+      this.setAuthToken(data.token);
+      return data;
+    } catch (error) {
+      console.error('Erro na API de login:', error);
+      throw error;
+    }
+  },
+
+  async logout(): Promise<void> {
+    console.log('API: Logout');
+    this.setAuthToken(null);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  },
+
+  async getUser(id: string): Promise<User> {
+    console.log('API: Get user', id);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return {
+      id: '1',
+      email: 'admin@example.com',
+      name: 'Admin User',
+      company: { id: '1', name: 'Empresa Exemplo' }
+    };
+  },
+
+  async getContracts(userId: string, page: number = 1, limit: number = 10): Promise<ContractsResponse> {
+    console.log('API: Get contracts for user', userId, 'page:', page);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const allContracts = [
+      {
+        id: '1',
+        name: 'Contrato de Prestação de Serviços',
+        description: 'Modelo padrão para prestação de serviços',
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z',
+        userId,
+        sections: []
+      },
+      {
+        id: '2',
+        name: 'Contrato de Trabalho',
+        description: 'Modelo para contratação de funcionários',
+        createdAt: '2024-01-10T14:30:00Z',
+        updatedAt: '2024-01-10T14:30:00Z',
+        userId,
+        sections: []
+      },
+      {
+        id: '3',
+        name: 'Contrato de Locação',
+        description: 'Modelo para locação de imóveis',
+        createdAt: '2024-01-08T09:15:00Z',
+        updatedAt: '2024-01-08T09:15:00Z',
+        userId,
+        sections: []
+      }
+    ];
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const contracts = allContracts.slice(startIndex, endIndex);
+
+    return {
+      contracts,
+      total: allContracts.length,
+      page,
+      totalPages: Math.ceil(allContracts.length / limit)
+    };
+  },
+
+  async filterContracts(userId: string, query: string, page: number = 1, limit: number = 10): Promise<ContractsResponse> {
+    console.log('API: Filter contracts', userId, query, 'page:', page);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    const allContracts = [
+      {
+        id: '1',
+        name: 'Contrato de Prestação de Serviços',
+        description: 'Modelo padrão para prestação de serviços',
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z',
+        userId,
+        sections: []
+      },
+      {
+        id: '2',
+        name: 'Contrato de Trabalho',
+        description: 'Modelo para contratação de funcionários',
+        createdAt: '2024-01-10T14:30:00Z',
+        updatedAt: '2024-01-10T14:30:00Z',
+        userId,
+        sections: []
+      },
+      {
+        id: '3',
+        name: 'Contrato de Locação',
+        description: 'Modelo para locação de imóveis',
+        createdAt: '2024-01-08T09:15:00Z',
+        updatedAt: '2024-01-08T09:15:00Z',
+        userId,
+        sections: []
+      }
+    ];
+
+    const filteredContracts = allContracts.filter(contract => 
+      contract.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const contracts = filteredContracts.slice(startIndex, endIndex);
+
+    return {
+      contracts,
+      total: filteredContracts.length,
+      page,
+      totalPages: Math.ceil(filteredContracts.length / limit)
+    };
+  },
+
+  async createContract(data: CreateContractData): Promise<Contract> {
+    console.log('API: Create contract', data);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      id: Date.now().toString(),
+      ...data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      userId: '1',
+      sections: []
+    };
+  },
+
+  async updateContract(id: string, data: Partial<CreateContractData>): Promise<Contract> {
+    console.log('API: Update contract', id, data);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      id,
+      name: data.name || 'Contract Name',
+      description: data.description || 'Contract Description',
+      userId: '1',
+      createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+      updatedAt: new Date().toISOString(),
+      sections: []
+    };
+  },
+
+  async deleteContract(id: string): Promise<void> {
+    console.log('API: Delete contract', id);
+    await new Promise(resolve => setTimeout(resolve, 800));
+  },
+
+  async downloadContractExample(id: string): Promise<void> {
+    console.log('API: Download contract example', id);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  },
+
+  async getSections(contractId: string): Promise<Section[]> {
+    console.log('API: Get sections for contract', contractId);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    return [
+      {
+        id: '1',
+        title: 'Cláusulas Gerais',
+        description: 'Estabelece as condições gerais entre as partes contratantes',
+        content: '<p>Este contrato estabelece as condições gerais entre as partes <span class="tag-placeholder">#NOME_COMPLETO#</span> e <span class="tag-placeholder">#EMPRESA#</span>.</p>',
+        order: 1,
+        contractId,
+        createdAt: '2024-01-15T10:00:00Z',
+        updatedAt: '2024-01-15T10:00:00Z'
+      },
+      {
+        id: '2',
+        title: 'Pagamento',
+        description: 'Define valores, prazos e condições de pagamento',
+        content: '<p>O valor a ser pago é de <span class="tag-placeholder">#VALOR#</span> até a data <span class="tag-placeholder">#DATA_VENCIMENTO#</span>.</p>',
+        order: 2,
+        contractId,
+        createdAt: '2024-01-15T10:05:00Z',
+        updatedAt: '2024-01-15T10:05:00Z'
+      }
+    ];
+  },
+
+  async createSection(data: CreateSectionData): Promise<Section> {
+    console.log('API: Create section', data);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return {
+      id: Date.now().toString(),
+      ...data,
+      order: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  },
+
+  async updateSection(id: string, data: Partial<CreateSectionData>): Promise<Section> {
+    console.log('API: Update section', id, data);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return {
+      id,
+      title: data.title || 'Updated Section',
+      description: data.description || 'Updated description',
+      content: data.content || '<p>Updated content</p>',
+      contractId: data.contractId || '1',
+      order: 1,
+      createdAt: '2024-01-15T10:00:00Z',
+      updatedAt: new Date().toISOString()
+    };
+  },
+
+  async updateSectionOrder(contractId: string, sectionOrders: { id: string; order: number }[]): Promise<void> {
+    console.log('API: Update section order', contractId, sectionOrders);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate API call to update section orders
+  },
+
+  async deleteSection(id: string): Promise<void> {
+    console.log('API: Delete section', id);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  },
+
+  // Contexts CRUD API
+  async getContexts(userId: string): Promise<Context[]> {
+    console.log('API: Get contexts for user', userId);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return [
+      {
+        id: '1',
+        name: 'Dados Cadastrais',
+        description: 'Informações pessoais e de identificação',
+        userId
+      },
+      {
+        id: '2',
+        name: 'Dados Financeiros',
+        description: 'Informações financeiras e de pagamento',
+        userId
+      },
+      {
+        id: '3',
+        name: 'Dados Contratuais',
+        description: 'Informações específicas do contrato',
+        userId
+      }
+    ];
+  },
+
+  async createContext(data: CreateContextData): Promise<Context> {
+    console.log('API: Create context', data);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    return {
+      id: Date.now().toString(),
+      ...data,
+      userId: '1'
+    };
+  },
+
+  async updateContext(id: string, data: CreateContextData): Promise<Context> {
+    console.log('API: Update context', id, data);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    return {
+      id,
+      ...data,
+      userId: '1'
+    };
+  },
+
+  async deleteContext(id: string): Promise<void> {
+    console.log('API: Delete context', id);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  },
+
+  // Tags API with Context
+  async getTags(userId: string): Promise<Tag[]> {
+    console.log('API: Get tags for user', userId);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    return [
+      {
+        id: '1',
+        name: 'NOME_COMPLETO',
+        type: 'text',
+        description: 'Nome completo da pessoa',
+        userId,
+        contextId: '1',
+        context: {
+          id: '1',
+          name: 'Dados Cadastrais',
+          description: 'Informações pessoais e de identificação',
+          userId
+        }
+      },
+      {
+        id: '2',
+        name: 'CPF',
+        type: 'text',
+        description: 'Número do CPF',
+        userId,
+        contextId: '1',
+        context: {
+          id: '1',
+          name: 'Dados Cadastrais',
+          description: 'Informações pessoais e de identificação',
+          userId
+        }
+      },
+      {
+        id: '3',
+        name: 'DATA_ASSINATURA',
+        type: 'date',
+        description: 'Data de assinatura do contrato',
+        userId,
+        contextId: '3',
+        context: {
+          id: '3',
+          name: 'Dados Contratuais',
+          description: 'Informações específicas do contrato',
+          userId
+        }
+      },
+      {
+        id: '4',
+        name: 'VALOR',
+        type: 'number',
+        description: 'Valor monetário',
+        userId,
+        contextId: '2',
+        context: {
+          id: '2',
+          name: 'Dados Financeiros',
+          description: 'Informações financeiras e de pagamento',
+          userId
+        }
+      },
+      {
+        id: '5',
+        name: 'EMPRESA',
+        type: 'text',
+        description: 'Nome da empresa',
+        userId,
+        contextId: '1',
+        context: {
+          id: '1',
+          name: 'Dados Cadastrais',
+          description: 'Informações pessoais e de identificação',
+          userId
+        }
+      }
+    ];
+  },
+
+  async createTag(data: CreateTagData): Promise<Tag> {
+    console.log('API: Create tag', data);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // Simulate finding the context
+    const contexts = await this.getContexts('1');
+    const context = contexts.find(c => c.id === data.contextId);
+    
+    return {
+      id: Date.now().toString(),
+      ...data,
+      userId: '1',
+      context
+    };
+  },
+
+  async updateTag(id: string, data: CreateTagData): Promise<Tag> {
+    console.log('API: Update tag', id, data);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // Simulate finding the context
+    const contexts = await this.getContexts('1');
+    const context = contexts.find(c => c.id === data.contextId);
+    
+    return {
+      id,
+      ...data,
+      userId: '1',
+      context
+    };
+  },
+
+  async deleteTag(id: string): Promise<void> {
+    console.log('API: Delete tag', id);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  },
+
+  async getCompanies(userId: string): Promise<Company[]> {
+    console.log('API: Get companies for user', userId);
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    return [
+      { id: '1', name: 'Empresa Exemplo' },
+      { id: '2', name: 'Outra Empresa LTDA' }
+    ];
+  },
+
+  async updateProfile(data: UpdateProfileData): Promise<User> {
+    console.log('API: Update profile', data);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      id: '1',
+      email: data.email || 'admin@example.com',
+      name: 'Admin User',
+      company: { id: '1', name: 'Empresa Exemplo' }
+    };
+  },
+
+  async importSections(contractId: string, sectionIds: string[]): Promise<void> {
+    console.log('API: Import sections', contractId, sectionIds);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  },
+
+  async processBatchContracts(contractIds: string[], file: File): Promise<void> {
+    console.log('API: Process batch contracts', contractIds, file.name);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Simulate file processing and ZIP download
+    const link = document.createElement('a');
+    link.href = 'data:application/zip;base64,UEsDBAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAbXlmaWxlLnR4dFBLAQIUAAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAABteWZpbGUudHh0UEsFBgAAAAABAAEANwAAAB8AAAAAAA==';
+    link.download = `contratos_lote_${Date.now()}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  async getGeneratedFiles(userId: string, page: number = 1, limit: number = 10): Promise<GeneratedFilesResponse> {
+    console.log('API: Get generated files for user', userId, 'page:', page);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const allFiles = [
+      {
+        id: '1',
+        templateId: '1',
+        userId,
+        createdAt: '2024-01-20T14:30:00Z',
+        templateName: 'Contrato de Prestação de Serviços',
+        userName: 'Admin User'
+      },
+      {
+        id: '2',
+        templateId: '2',
+        userId,
+        createdAt: '2024-01-19T09:15:00Z',
+        templateName: 'Contrato de Trabalho',
+        userName: 'Admin User'
+      },
+      {
+        id: '3',
+        templateId: '1',
+        userId,
+        createdAt: '2024-01-18T16:45:00Z',
+        templateName: 'Contrato de Prestação de Serviços',
+        userName: 'Admin User'
+      },
+      {
+        id: '4',
+        templateId: '3',
+        userId,
+        createdAt: '2024-01-17T11:20:00Z',
+        templateName: 'Contrato de Locação',
+        userName: 'Admin User'
+      },
+      {
+        id: '5',
+        templateId: '2',
+        userId,
+        createdAt: '2024-01-16T15:30:00Z',
+        templateName: 'Contrato de Trabalho',
+        userName: 'Admin User'
+      },
+      {
+        id: '6',
+        templateId: '1',
+        userId,
+        createdAt: '2024-01-15T10:45:00Z',
+        templateName: 'Contrato de Prestação de Serviços',
+        userName: 'Admin User'
+      },
+      {
+        id: '7',
+        templateId: '3',
+        userId,
+        createdAt: '2024-01-14T13:15:00Z',
+        templateName: 'Contrato de Locação',
+        userName: 'Admin User'
+      },
+      {
+        id: '8',
+        templateId: '2',
+        userId,
+        createdAt: '2024-01-13T08:30:00Z',
+        templateName: 'Contrato de Trabalho',
+        userName: 'Admin User'
+      },
+      {
+        id: '9',
+        templateId: '1',
+        userId,
+        createdAt: '2024-01-12T17:20:00Z',
+        templateName: 'Contrato de Prestação de Serviços',
+        userName: 'Admin User'
+      },
+      {
+        id: '10',
+        templateId: '3',
+        userId,
+        createdAt: '2024-01-11T12:00:00Z',
+        templateName: 'Contrato de Locação',
+        userName: 'Admin User'
+      },
+      {
+        id: '11',
+        templateId: '2',
+        userId,
+        createdAt: '2024-01-10T14:45:00Z',
+        templateName: 'Contrato de Trabalho',
+        userName: 'Admin User'
+      },
+      {
+        id: '12',
+        templateId: '1',
+        userId,
+        createdAt: '2024-01-09T09:30:00Z',
+        templateName: 'Contrato de Prestação de Serviços',
+        userName: 'Admin User'
+      }
+    ];
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const files = allFiles.slice(startIndex, endIndex);
+
+    return {
+      files,
+      total: allFiles.length,
+      page,
+      totalPages: Math.ceil(allFiles.length / limit)
+    };
+  },
+
+  async downloadGeneratedFile(fileId: string): Promise<void> {
+    console.log('API: Download generated file', fileId);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simulate file download
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFsgMyAwIFIgXQovQ291bnQgMQo+PgplbmRvYmoKMyAwIG9iago8PAovVHlwZSAvUGFnZQovUGFyZW50IDIgMCBSCi9NZWRpYUJveCBbIDAgMCA2MTIgNzkyIF0KPj4KZW5kb2JqCnhyZWYKMCA0CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA0Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgoxOTQKJSVFT0Y=';
+    link.download = `arquivo_gerado_${fileId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
+
+export default api;

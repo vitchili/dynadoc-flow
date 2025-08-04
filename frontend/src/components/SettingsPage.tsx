@@ -1,0 +1,870 @@
+import React, { useEffect, useState } from 'react';
+import { Plus, Tag as TagIcon, Edit, Trash2, Save, Loader2, FolderOpen, Folder } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Tag, Context, CreateTagData, CreateContextData } from '@/types';
+import api from '@/services/api';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+
+const SettingsPage: React.FC = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [contexts, setContexts] = useState<Context[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Modal states for tags
+  const [showNewTagModal, setShowNewTagModal] = useState(false);
+  const [showEditTagModal, setShowEditTagModal] = useState(false);
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+
+  // Modal states for contexts
+  const [showNewContextModal, setShowNewContextModal] = useState(false);
+  const [showEditContextModal, setShowEditContextModal] = useState(false);
+  const [editingContext, setEditingContext] = useState<Context | null>(null);
+
+  // Form state for tags
+  const [newTagData, setNewTagData] = useState<CreateTagData>({
+    name: '',
+    type: 'text',
+    description: '',
+    contextId: '',
+    options: []
+  });
+
+  // Form state for contexts
+  const [newContextData, setNewContextData] = useState<CreateContextData>({
+    name: '',
+    description: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      loadData();
+    }
+  }, [user]);
+
+  const loadData = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const [tagsData, contextsData] = await Promise.all([
+        api.getTags(user.id),
+        api.getContexts(user.id)
+      ]);
+      setTags(tagsData);
+      setContexts(contextsData);
+    } catch (error) {
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Não foi possível carregar as tags e contextos.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetTagForm = () => {
+    setNewTagData({
+      name: '',
+      type: 'text',
+      description: '',
+      contextId: '',
+      options: []
+    });
+    setEditingTag(null);
+  };
+
+  const resetContextForm = () => {
+    setNewContextData({
+      name: '',
+      description: ''
+    });
+    setEditingContext(null);
+  };
+
+  const handleCreateTag = async () => {
+    if (!user || !newTagData.name.trim() || !newTagData.contextId) return;
+
+    try {
+      setSaving(true);
+      const tag = await api.createTag({
+        ...newTagData,
+        name: newTagData.name.toUpperCase().replace(/\s+/g, '_')
+      });
+      setTags(prev => [...prev, tag]);
+      resetTagForm();
+      setShowNewTagModal(false);
+      toast({
+        title: "Tag criada!",
+        description: "A nova tag dinâmica foi criada com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao criar tag",
+        description: "Não foi possível criar a tag.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEditTag = (tag: Tag) => {
+    setEditingTag(tag);
+    setNewTagData({
+      name: tag.name,
+      type: tag.type,
+      description: tag.description,
+      contextId: tag.contextId,
+      options: tag.options || []
+    });
+    setShowEditTagModal(true);
+  };
+
+  const handleUpdateTag = async () => {
+    if (!editingTag) return;
+
+    try {
+      setSaving(true);
+      const updatedTag = await api.updateTag(editingTag.id, newTagData);
+      setTags(prev => prev.map(t => t.id === editingTag.id ? updatedTag : t));
+      resetTagForm();
+      setShowEditTagModal(false);
+      toast({
+        title: "Tag atualizada!",
+        description: "A tag foi atualizada com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar tag",
+        description: "Não foi possível atualizar a tag.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta tag? Esta ação não pode ser desfeita.')) return;
+
+    try {
+      await api.deleteTag(tagId);
+      setTags(prev => prev.filter(t => t.id !== tagId));
+      toast({
+        title: "Tag excluída!",
+        description: "A tag foi excluída com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir tag",
+        description: "Não foi possível excluir a tag.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Context management functions
+  const handleCreateContext = async () => {
+    if (!user || !newContextData.name.trim()) return;
+
+    try {
+      setSaving(true);
+      const context = await api.createContext(newContextData);
+      setContexts(prev => [...prev, context]);
+      resetContextForm();
+      setShowNewContextModal(false);
+      toast({
+        title: "Contexto criado!",
+        description: "O novo contexto foi criado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao criar contexto",
+        description: "Não foi possível criar o contexto.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEditContext = (context: Context) => {
+    setEditingContext(context);
+    setNewContextData({
+      name: context.name,
+      description: context.description || ''
+    });
+    setShowEditContextModal(true);
+  };
+
+  const handleUpdateContext = async () => {
+    if (!editingContext) return;
+
+    try {
+      setSaving(true);
+      const updatedContext = await api.updateContext(editingContext.id, newContextData);
+      setContexts(prev => prev.map(c => c.id === editingContext.id ? updatedContext : c));
+      resetContextForm();
+      setShowEditContextModal(false);
+      toast({
+        title: "Contexto atualizado!",
+        description: "O contexto foi atualizado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar contexto",
+        description: "Não foi possível atualizar o contexto.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteContext = async (contextId: string) => {
+    const relatedTags = tags.filter(tag => tag.contextId === contextId);
+    if (relatedTags.length > 0) {
+      if (!confirm(`Este contexto possui ${relatedTags.length} tag(s) associada(s). Tem certeza que deseja excluir? As tags também serão removidas.`)) return;
+    } else {
+      if (!confirm('Tem certeza que deseja excluir este contexto? Esta ação não pode ser desfeita.')) return;
+    }
+
+    try {
+      await api.deleteContext(contextId);
+      setContexts(prev => prev.filter(c => c.id !== contextId));
+      setTags(prev => prev.filter(t => t.contextId !== contextId));
+      toast({
+        title: "Contexto excluído!",
+        description: "O contexto e suas tags foram excluídos com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir contexto",
+        description: "Não foi possível excluir o contexto.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'text': return 'bg-blue-500/20 text-blue-300';
+      case 'number': return 'bg-green-500/20 text-green-300';
+      case 'date': return 'bg-purple-500/20 text-purple-300';
+      case 'select': return 'bg-orange-500/20 text-orange-300';
+      default: return 'bg-gray-500/20 text-gray-300';
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'text': return 'Texto';
+      case 'number': return 'Número';
+      case 'date': return 'Data';
+      case 'select': return 'Seleção';
+      default: return type;
+    }
+  };
+
+  // Group tags by context
+  const tagsByContext = tags.reduce((acc, tag) => {
+    const contextName = tag.context?.name || 'Sem Contexto';
+    if (!acc[contextName]) {
+      acc[contextName] = [];
+    }
+    acc[contextName].push(tag);
+    return acc;
+  }, {} as Record<string, Tag[]>);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="glass-card p-8 text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-300">Carregando configurações...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-bold gradient-text">Configurações</h1>
+        <p className="text-gray-300 mt-2">Gerencie suas tags dinâmicas e contextos</p>
+      </div>
+
+      <Tabs defaultValue="tags" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 glass-card border-white/20">
+          <TabsTrigger value="tags" className="data-[state=active]:bg-white/20">
+            <TagIcon className="w-4 h-4 mr-2" />
+            Gerenciar Tags
+          </TabsTrigger>
+          <TabsTrigger value="contexts" className="data-[state=active]:bg-white/20">
+            <FolderOpen className="w-4 h-4 mr-2" />
+            Gerenciar Contextos
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="tags" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-200">Tags Dinâmicas</h2>
+              <p className="text-gray-400">Gerencie suas tags organizadas por contexto</p>
+            </div>
+            
+            <Dialog open={showNewTagModal} onOpenChange={setShowNewTagModal}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nova Tag
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="glass-strong border-white/20">
+                <DialogHeader>
+                  <DialogTitle>Criar Nova Tag</DialogTitle>
+                  <DialogDescription>
+                    Crie uma nova tag dinâmica para usar em seus contratos
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="tag-context">Contexto</Label>
+                    <Select
+                      value={newTagData.contextId}
+                      onValueChange={(value) => setNewTagData(prev => ({ ...prev, contextId: value }))}
+                    >
+                      <SelectTrigger className="glass bg-white/5 border-white/20">
+                        <SelectValue placeholder="Selecione um contexto" />
+                      </SelectTrigger>
+                      <SelectContent className="glass-strong border-white/20">
+                        {contexts.map((context) => (
+                          <SelectItem key={context.id} value={context.id}>
+                            {context.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="tag-name">Nome da Tag</Label>
+                    <Input
+                      id="tag-name"
+                      placeholder="Ex: Nome Completo"
+                      value={newTagData.name}
+                      onChange={(e) => setNewTagData(prev => ({
+                        ...prev,
+                        name: e.target.value
+                      }))}
+                      className="glass bg-white/5 border-white/20"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      O nome será convertido para maiúsculas e espaços serão substituídos por underscore
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="tag-type">Tipo de Campo</Label>
+                    <Select
+                      value={newTagData.type}
+                      onValueChange={(value: 'text' | 'number' | 'date' | 'select') => 
+                        setNewTagData(prev => ({ ...prev, type: value }))
+                      }
+                    >
+                      <SelectTrigger className="glass bg-white/5 border-white/20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="glass-strong border-white/20">
+                        <SelectItem value="text">Texto</SelectItem>
+                        <SelectItem value="number">Número</SelectItem>
+                        <SelectItem value="date">Data</SelectItem>
+                        <SelectItem value="select">Seleção</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="tag-description">Descrição</Label>
+                    <Textarea
+                      id="tag-description"
+                      placeholder="Descreva o propósito desta tag..."
+                      value={newTagData.description}
+                      onChange={(e) => setNewTagData(prev => ({
+                        ...prev,
+                        description: e.target.value
+                      }))}
+                      className="glass bg-white/5 border-white/20"
+                    />
+                  </div>
+
+                  {newTagData.type === 'select' && (
+                    <div>
+                      <Label htmlFor="tag-options">Opções (uma por linha)</Label>
+                      <Textarea
+                        id="tag-options"
+                        placeholder="Opção 1&#10;Opção 2&#10;Opção 3"
+                        value={newTagData.options?.join('\n') || ''}
+                        onChange={(e) => setNewTagData(prev => ({
+                          ...prev,
+                          options: e.target.value.split('\n').filter(o => o.trim())
+                        }))}
+                        className="glass bg-white/5 border-white/20"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        resetTagForm();
+                        setShowNewTagModal(false);
+                      }}
+                      className="border-white/20"
+                      disabled={saving}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleCreateTag}
+                      disabled={!newTagData.name.trim() || !newTagData.contextId || saving}
+                      className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Criando...
+                        </>
+                      ) : (
+                        'Criar Tag'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {tags.length === 0 ? (
+            <Card className="glass-card border-white/20 text-center py-12">
+              <CardHeader>
+                <TagIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <CardTitle>Nenhuma tag criada</CardTitle>
+                <CardDescription>
+                  Crie sua primeira tag dinâmica para personalizar seus contratos
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {Object.entries(tagsByContext).map(([contextName, contextTags]) => (
+                <div key={contextName} className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-200 border-b border-white/20 pb-2">
+                    {contextName}
+                  </h3>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {contextTags.map((tag) => (
+                      <Card key={tag.id} className="glass-card border-white/20">
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between">
+                            <Badge className={`${getTypeColor(tag.type)} border-0`}>
+                              {getTypeLabel(tag.type)}
+                            </Badge>
+                            <div className="flex space-x-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditTag(tag)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteTag(tag.id)}
+                                className="h-6 w-6 p-0 text-red-400 hover:text-red-300"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <CardTitle className="text-sm">#{tag.name}#</CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-xs text-gray-300 mb-2">{tag.description}</p>
+                          {tag.options && tag.options.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-500 mb-1">Opções:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {tag.options.slice(0, 2).map((option, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs border-white/20">
+                                    {option}
+                                  </Badge>
+                                ))}
+                                {tag.options.length > 2 && (
+                                  <Badge variant="outline" className="text-xs border-white/20">
+                                    +{tag.options.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Modal Editar Tag */}
+          <Dialog open={showEditTagModal} onOpenChange={setShowEditTagModal}>
+            <DialogContent className="glass-strong border-white/20">
+              <DialogHeader>
+                <DialogTitle>Editar Tag</DialogTitle>
+                <DialogDescription>
+                  Edite as informações da tag "{editingTag?.name}"
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-tag-context">Contexto</Label>
+                  <Select
+                    value={newTagData.contextId}
+                    onValueChange={(value) => setNewTagData(prev => ({ ...prev, contextId: value }))}
+                  >
+                    <SelectTrigger className="glass bg-white/5 border-white/20">
+                      <SelectValue placeholder="Selecione um contexto" />
+                    </SelectTrigger>
+                    <SelectContent className="glass-strong border-white/20">
+                      {contexts.map((context) => (
+                        <SelectItem key={context.id} value={context.id}>
+                          {context.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-tag-name">Nome da Tag</Label>
+                  <Input
+                    id="edit-tag-name"
+                    value={newTagData.name}
+                    onChange={(e) => setNewTagData(prev => ({
+                      ...prev,
+                      name: e.target.value
+                    }))}
+                    className="glass bg-white/5 border-white/20"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-tag-type">Tipo de Campo</Label>
+                  <Select
+                    value={newTagData.type}
+                    onValueChange={(value: 'text' | 'number' | 'date' | 'select') => 
+                      setNewTagData(prev => ({ ...prev, type: value }))
+                    }
+                  >
+                    <SelectTrigger className="glass bg-white/5 border-white/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass-strong border-white/20">
+                      <SelectItem value="text">Texto</SelectItem>
+                      <SelectItem value="number">Número</SelectItem>
+                      <SelectItem value="date">Data</SelectItem>
+                      <SelectItem value="select">Seleção</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-tag-description">Descrição</Label>
+                  <Textarea
+                    id="edit-tag-description"
+                    value={newTagData.description}
+                    onChange={(e) => setNewTagData(prev => ({
+                      ...prev,
+                      description: e.target.value
+                    }))}
+                    className="glass bg-white/5 border-white/20"
+                  />
+                </div>
+
+                {newTagData.type === 'select' && (
+                  <div>
+                    <Label htmlFor="edit-tag-options">Opções (uma por linha)</Label>
+                    <Textarea
+                      id="edit-tag-options"
+                      value={newTagData.options?.join('\n') || ''}
+                      onChange={(e) => setNewTagData(prev => ({
+                        ...prev,
+                        options: e.target.value.split('\n').filter(o => o.trim())
+                      }))}
+                      className="glass bg-white/5 border-white/20"
+                    />
+                  </div>
+                )}
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      resetTagForm();
+                      setShowEditTagModal(false);
+                    }}
+                    className="border-white/20"
+                    disabled={saving}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleUpdateTag}
+                    disabled={!newTagData.name.trim() || !newTagData.contextId || saving}
+                    className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      'Salvar Alterações'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+
+        <TabsContent value="contexts" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-200">Contextos</h2>
+              <p className="text-gray-400">Organize suas tags em contextos para facilitar o gerenciamento</p>
+            </div>
+            
+            <Dialog open={showNewContextModal} onOpenChange={setShowNewContextModal}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Novo Contexto
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="glass-strong border-white/20">
+                <DialogHeader>
+                  <DialogTitle>Criar Novo Contexto</DialogTitle>
+                  <DialogDescription>
+                    Crie um novo contexto para organizar suas tags
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="context-name">Nome do Contexto</Label>
+                    <Input
+                      id="context-name"
+                      placeholder="Ex: Dados Cadastrais"
+                      value={newContextData.name}
+                      onChange={(e) => setNewContextData(prev => ({
+                        ...prev,
+                        name: e.target.value
+                      }))}
+                      className="glass bg-white/5 border-white/20"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="context-description">Descrição</Label>
+                    <Textarea
+                      id="context-description"
+                      placeholder="Descreva o propósito deste contexto..."
+                      value={newContextData.description}
+                      onChange={(e) => setNewContextData(prev => ({
+                        ...prev,
+                        description: e.target.value
+                      }))}
+                      className="glass bg-white/5 border-white/20"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        resetContextForm();
+                        setShowNewContextModal(false);
+                      }}
+                      className="border-white/20"
+                      disabled={saving}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleCreateContext}
+                      disabled={!newContextData.name.trim() || saving}
+                      className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Criando...
+                        </>
+                      ) : (
+                        'Criar Contexto'
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {contexts.length === 0 ? (
+            <Card className="glass-card border-white/20 text-center py-12">
+              <CardHeader>
+                <Folder className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                <CardTitle>Nenhum contexto criado</CardTitle>
+                <CardDescription>
+                  Crie seu primeiro contexto para organizar suas tags
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {contexts.map((context) => {
+                const contextTagCount = tags.filter(tag => tag.contextId === context.id).length;
+                return (
+                  <Card key={context.id} className="glass-card border-white/20">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <FolderOpen className="w-5 h-5 text-blue-400" />
+                          <CardTitle className="text-lg">{context.name}</CardTitle>
+                        </div>
+                        <div className="flex space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditContext(context)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteContext(context.id)}
+                            className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardDescription className="text-gray-300">
+                        {context.description || 'Sem descrição'}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="border-white/20">
+                          {contextTagCount} tag{contextTagCount !== 1 ? 's' : ''}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Modal Editar Contexto */}
+          <Dialog open={showEditContextModal} onOpenChange={setShowEditContextModal}>
+            <DialogContent className="glass-strong border-white/20">
+              <DialogHeader>
+                <DialogTitle>Editar Contexto</DialogTitle>
+                <DialogDescription>
+                  Edite as informações do contexto "{editingContext?.name}"
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-context-name">Nome do Contexto</Label>
+                  <Input
+                    id="edit-context-name"
+                    value={newContextData.name}
+                    onChange={(e) => setNewContextData(prev => ({
+                      ...prev,
+                      name: e.target.value
+                    }))}
+                    className="glass bg-white/5 border-white/20"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-context-description">Descrição</Label>
+                  <Textarea
+                    id="edit-context-description"
+                    value={newContextData.description}
+                    onChange={(e) => setNewContextData(prev => ({
+                      ...prev,
+                      description: e.target.value
+                    }))}
+                    className="glass bg-white/5 border-white/20"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      resetContextForm();
+                      setShowEditContextModal(false);
+                    }}
+                    className="border-white/20"
+                    disabled={saving}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleUpdateContext}
+                    disabled={!newContextData.name.trim() || saving}
+                    className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      'Salvar Alterações'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default SettingsPage;
