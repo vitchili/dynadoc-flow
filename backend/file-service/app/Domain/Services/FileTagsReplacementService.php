@@ -8,12 +8,16 @@ class FileTagsReplacementService
 {
     public static function replace(Collection $sections, array $payload): string
     {
-        $completedHtml = '';
+        $htmlFinal = $sections->map(function ($section) use ($payload) {
+            $htmlContent = $section['htmlContent'];
+            
+            foreach ($payload as $tag => $valor) {
+                $htmlContent = str_replace($tag, $valor, $htmlContent);
+            }
 
-        foreach ($sections as $section) {
-            $completedHtml .= str_replace(array_keys($payload), array_values($payload), $section->htmlContent); 
-        }
+            return $htmlContent . "<div style='page-break-after: always;'></div>";
+        })->implode('');
 
-       return $completedHtml;
+        return $htmlFinal;
     }
 }
