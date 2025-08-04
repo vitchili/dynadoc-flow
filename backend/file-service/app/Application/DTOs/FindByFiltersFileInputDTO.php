@@ -16,6 +16,7 @@ final class FindByFiltersFileInputDTO extends AbstractDTO
         public readonly ?string $path,
         public readonly ?bool $readyToDownload,
         public readonly ?FileStatusEnum $status,
+        public readonly ?string $errors,
     ) {
     }
 }

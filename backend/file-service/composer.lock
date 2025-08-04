@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb7a3a2beacaf7d86e3e62f763060bad",
+    "content-hash": "cbd0ae9f7c35f09298c6d18d045c7332",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -1272,6 +1272,73 @@
                 }
             ],
             "time": "2025-02-03T10:55:03+00:00"
+        },
+        {
+            "name": "knplabs/knp-snappy",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KnpLabs/snappy.git",
+                "reference": "3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KnpLabs/snappy/zipball/3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7",
+                "reference": "3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "psr/log": "^2.0||^3.0",
+                "symfony/process": "^5.0||^6.0||^7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "pedrotroller/php-cs-custom-fixer": "^2.19",
+                "phpstan/phpstan": "^1.0.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Knp\\Snappy\\": "src/Knp/Snappy"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KNP Labs Team",
+                    "homepage": "http://knplabs.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://github.com/KnpLabs/snappy/contributors"
+                }
+            ],
+            "description": "PHP library allowing thumbnail, snapshot or PDF generation from a url or a html page. Wrapper for wkhtmltopdf/wkhtmltoimage.",
+            "homepage": "http://github.com/KnpLabs/snappy",
+            "keywords": [
+                "knp",
+                "knplabs",
+                "pdf",
+                "snapshot",
+                "thumbnail",
+                "wkhtmltopdf"
+            ],
+            "support": {
+                "issues": "https://github.com/KnpLabs/snappy/issues",
+                "source": "https://github.com/KnpLabs/snappy/tree/v1.5.1"
+            },
+            "time": "2025-01-06T16:53:26+00:00"
         },
         {
             "name": "laravel/framework",

@@ -153,7 +153,7 @@ class SectionRepository implements SectionRepositoryInterface
             description: $section->description,
             templateId: $section->template_id,
             htmlContent: $section->html_content,
-            sectionOrder: $section->sectionOrder
+            sectionOrder: $section->section_order
         );
     }
 

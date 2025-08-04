@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('path')->nullable();
             $table->boolean('ready_to_download')->default(false);
             $table->integer('status');
+            $table->string('errors');
             $table->timestamps();
         });
     }

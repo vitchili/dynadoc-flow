@@ -18,5 +18,7 @@ interface FileRepositoryInterface
 
     public function insert(File $context): string;
 
+    public function update(File $context): bool;
+
     public function delete(string $id): bool;
 }

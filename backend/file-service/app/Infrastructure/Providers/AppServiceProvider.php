@@ -11,6 +11,7 @@ use App\Infrastructure\Repositories\FileRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Knp\Snappy\Pdf;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +21,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton( \Illuminate\Contracts\Debug\ExceptionHandler::class, ExceptionHandler::class );
-
+        
+        $this->app->singleton(Pdf::class, function () {
+            return new Pdf('/usr/bin/wkhtmltopdf');
+        });
+        
         $this->app->singleton(LoggedUserHelper::class, function ($app) {
             return new LoggedUserHelper($app->make(Request::class));
         });

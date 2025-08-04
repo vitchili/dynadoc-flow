@@ -19,6 +19,7 @@ final class File extends AbstractDTO
         public string|null $path,
         public bool $readyToDownload,
         public FileStatusEnum $status,
+        public ?string $errors,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
     ) {
@@ -40,6 +41,7 @@ final class File extends AbstractDTO
             path: null,
             readyToDownload: false,
             status: FileStatusEnum::PROCESSING,
+            errors: null,
             createdAt: new DateTimeImmutable(),
             updatedAt: new DateTimeImmutable()
         );
@@ -51,9 +53,10 @@ final class File extends AbstractDTO
         string $templateId,
         string $userId,
         string $payload,
-        string $path,
-        bool   $readyToDownload,
+        ?string $path,
+        ?bool   $readyToDownload,
         FileStatusEnum $status,
+        ?string $errors,
         DateTimeImmutable $createdAt,
         DateTimeImmutable $updatedAt,
     ): self
@@ -67,17 +70,19 @@ final class File extends AbstractDTO
             path: $path,
             readyToDownload: $readyToDownload,
             status: $status,
+            errors: $errors,
             createdAt: $createdAt,
             updatedAt: $updatedAt,
         );
     }
 
     public function update(
-        ?string $name,
-        ?string $payload,
-        ?string $path,
-        ?string $readyToDownload,
-        ?string $status,
+        ?string $name = null,
+        ?string $payload = null,
+        ?string $path = null,
+        ?bool $readyToDownload = null,
+        ?FileStatusEnum $status = null,
+        ?string $errors = null,
     ): self
     {
         return new self(
@@ -89,6 +94,7 @@ final class File extends AbstractDTO
             path: $path ?? $this->path,
             readyToDownload: $readyToDownload ?? $this->readyToDownload,
             status: $status ?? $this->status,
+            errors: $errors ?? $this->errors,
             createdAt: $this->createdAt,
             updatedAt: $this->updatedAt,
         );

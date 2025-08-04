@@ -29,8 +29,8 @@ class TemplateDeliveredConsumer extends Command
             ->withHandler(function (ConsumedMessage $message) {
                 $message = json_encode($message->getBody());
                 $templateSections = json_decode($message);
-                $template = $templateSections['data']['template'];
-                $sections = $templateSections['data']['sections'];
+                $template = $templateSections->data->template;
+                $sections = $templateSections->data->sections;
 
                 $input = new FileContentInputDTO(
                     template: $template,
@@ -39,7 +39,7 @@ class TemplateDeliveredConsumer extends Command
 
                 $this->fileHandler->execute($input);
 
-                echo "Mensagem recebida: " . $message  . PHP_EOL; //Retirar e incluir chamada de event sourcing
+                echo "Mensagem recebida: " . $message  . PHP_EOL;
             })
             ->build()
             ->consume();

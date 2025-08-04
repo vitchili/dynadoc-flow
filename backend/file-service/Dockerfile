@@ -2,7 +2,7 @@ FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y \
     git unzip curl libpng-dev libonig-dev libxml2-dev zip libzip-dev \
-    librdkafka-dev libzstd-dev libssl-dev \
+    librdkafka-dev libzstd-dev libssl-dev wkhtmltopdf \ 
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
     && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath

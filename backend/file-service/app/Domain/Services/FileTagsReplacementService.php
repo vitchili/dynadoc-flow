@@ -9,8 +9,8 @@ class FileTagsReplacementService
     public static function replace(Collection $sections, array $payload): string
     {
         $htmlFinal = $sections->map(function ($section) use ($payload) {
-            $htmlContent = $section['htmlContent'];
-            
+            $htmlContent = $section->htmlContent;
+
             foreach ($payload as $tag => $valor) {
                 $htmlContent = str_replace($tag, $valor, $htmlContent);
             }
