@@ -30,7 +30,7 @@ class TemplateRequestedConsumer extends Command
 
                 $templateSectionsOutputDTO = $this->deliverTemplateHandler->execute($templateId);
 
-                echo "Mensagem recebida: " . $templateId  . PHP_EOL; //Retirar e chamar Event Sourcing.
+                echo "Mensagem recebida: " . $templateId  . PHP_EOL;
             })
             ->build()
             ->consume();

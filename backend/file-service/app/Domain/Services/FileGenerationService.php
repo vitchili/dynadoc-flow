@@ -8,7 +8,7 @@ class FileGenerationService
 {
     public function __construct(protected Pdf $pdf) {}
 
-    public function generate(string $filename, string $htmlContent): string
+    public function generate(string $fileName, string $htmlContent): string
     {
         $options = [
             'page-size'    => 'A4',
@@ -21,10 +21,13 @@ class FileGenerationService
 
         $this->pdf->setOptions($options);
 
-        $outputPath = storage_path('app/public/' . $filename . '_' . uniqid() . '.pdf');
+        $uniqidFileName = $fileName . '_' . uniqid() . '.pdf';
+        $outputPath = storage_path('app/public/tmp/' . $uniqidFileName);
+
+        $htmlContent = mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8');
 
         $this->pdf->generateFromHtml($htmlContent, $outputPath);
 
-        return $outputPath;
+        return $uniqidFileName;
     }
 }

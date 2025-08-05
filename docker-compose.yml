@@ -282,6 +282,26 @@ services:
     networks:
       - laravel-net
 
+  localstack:
+    image: localstack/localstack:4.7.0
+    container_name: localstack
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=s3
+      - LOCALSTACK_TMPDIR=/tmp/localstack-data
+      - TMPDIR=/tmp/localstack-data
+      - DATA_DIR=/var/lib/localstack
+    ports:
+      - '4566-4583:4566-4583'
+    volumes:
+      - ./.docker/aws/localstack-data:/var/lib/localstack
+      - ./.docker/aws/localstack-tmp:/tmp/localstack-data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.docker/aws/localstack-init:/etc/localstack/init/ready.d
+    networks:
+      - laravel-net
+
 networks:
   laravel-net:
     driver: bridge
