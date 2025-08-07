@@ -22,4 +22,9 @@ class LoggedUserHelper
     {
         return $this->get()['userId'] ?? null;
     }
+
+    public function token(): ?string
+    {
+        return $this->get()['token'] ?? null;
+    }
 }

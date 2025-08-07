@@ -13,6 +13,7 @@ class ExceptionHandler extends Handler
 {
     public function render($request, \Throwable $e): Response
     {
+        logger()->error(json_encode($e->getMessage()));
         // if ($e instanceof NotFoundHttpException || $e instanceof NotFoundException) {
         //     return response()->json([
         //         'message' => 'Operation Successfully',

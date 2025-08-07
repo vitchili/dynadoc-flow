@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'host_internal_services' => [
+        'user' => env('HOST_USER_SERVICE'),
+        'template' => env('HOST_TEMPLATE_SERVICE'),
+    ],
+
 ];

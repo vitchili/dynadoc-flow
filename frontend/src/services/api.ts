@@ -464,23 +464,51 @@ const api = {
   },
 
   async updateTag(id: string, data: CreateTagData): Promise<Tag> {
-    console.log('API: Update tag', id, data);
     await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Simulate finding the context
-    const contexts = await this.getContexts('1');
-    const context = contexts.find(c => c.id === data.contextId);
-    
-    return {
-      id,
-      ...data,
-      context
-    };
+
+    try{
+      const response = await fetch(`${BASE_URL}/tags/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar tag');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data.id
+
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   async deleteTag(id: string): Promise<void> {
-    console.log('API: Delete tag', id);
     await new Promise(resolve => setTimeout(resolve, 500));
+
+    try{
+      const response = await fetch(`${BASE_URL}/tags/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao excluir tag');
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   async getCompanies(userId: string): Promise<Company[]> {
@@ -523,108 +551,36 @@ const api = {
   },
 
   async getGeneratedFiles(userId: string, page: number = 1, limit: number = 10): Promise<GeneratedFilesResponse> {
-    console.log('API: Get generated files for user', userId, 'page:', page);
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const allFiles = [
-      {
-        id: '1',
-        templateId: '1',
-        userId,
-        createdAt: '2024-01-20T14:30:00Z',
-        templateName: 'Contrato de Prestação de Serviços',
-        userName: 'Admin User'
-      },
-      {
-        id: '2',
-        templateId: '2',
-        userId,
-        createdAt: '2024-01-19T09:15:00Z',
-        templateName: 'Contrato de Trabalho',
-        userName: 'Admin User'
-      },
-      {
-        id: '3',
-        templateId: '1',
-        userId,
-        createdAt: '2024-01-18T16:45:00Z',
-        templateName: 'Contrato de Prestação de Serviços',
-        userName: 'Admin User'
-      },
-      {
-        id: '4',
-        templateId: '3',
-        userId,
-        createdAt: '2024-01-17T11:20:00Z',
-        templateName: 'Contrato de Locação',
-        userName: 'Admin User'
-      },
-      {
-        id: '5',
-        templateId: '2',
-        userId,
-        createdAt: '2024-01-16T15:30:00Z',
-        templateName: 'Contrato de Trabalho',
-        userName: 'Admin User'
-      },
-      {
-        id: '6',
-        templateId: '1',
-        userId,
-        createdAt: '2024-01-15T10:45:00Z',
-        templateName: 'Contrato de Prestação de Serviços',
-        userName: 'Admin User'
-      },
-      {
-        id: '7',
-        templateId: '3',
-        userId,
-        createdAt: '2024-01-14T13:15:00Z',
-        templateName: 'Contrato de Locação',
-        userName: 'Admin User'
-      },
-      {
-        id: '8',
-        templateId: '2',
-        userId,
-        createdAt: '2024-01-13T08:30:00Z',
-        templateName: 'Contrato de Trabalho',
-        userName: 'Admin User'
-      },
-      {
-        id: '9',
-        templateId: '1',
-        userId,
-        createdAt: '2024-01-12T17:20:00Z',
-        templateName: 'Contrato de Prestação de Serviços',
-        userName: 'Admin User'
-      },
-      {
-        id: '10',
-        templateId: '3',
-        userId,
-        createdAt: '2024-01-11T12:00:00Z',
-        templateName: 'Contrato de Locação',
-        userName: 'Admin User'
-      },
-      {
-        id: '11',
-        templateId: '2',
-        userId,
-        createdAt: '2024-01-10T14:45:00Z',
-        templateName: 'Contrato de Trabalho',
-        userName: 'Admin User'
-      },
-      {
-        id: '12',
-        templateId: '1',
-        userId,
-        createdAt: '2024-01-09T09:30:00Z',
-        templateName: 'Contrato de Prestação de Serviços',
-        userName: 'Admin User'
-      }
-    ];
+    try{
+      const response = await fetch(`${BASE_URL}/files/filters`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar arquivos');
+      }
+      
+      const apiResponse = await response.json();
+
+      var allFiles = []
+
+      apiResponse.data.forEach(element => {
+        allFiles.push({
+          id: element.id,
+          templateId: element.templateId,
+          userId: element.userId,
+          createdAt: element.createdAt,
+          templateName: element.templateName,
+        })
+      });
+  
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const files = allFiles.slice(startIndex, endIndex);
@@ -635,6 +591,10 @@ const api = {
       page,
       totalPages: Math.ceil(allFiles.length / limit)
     };
+
+    } catch (error) {
+      throw new Error('Erro ao consultar contextos');
+    }
   },
 
   async downloadGeneratedFile(fileId: string): Promise<void> {

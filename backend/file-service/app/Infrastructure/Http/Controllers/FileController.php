@@ -23,6 +23,7 @@ class FileController extends BaseController
             path: $request->validated('path'),
             readyToDownload: $request->validated('readyToDownload'),
             status: $request->validated('status'),
+            errors: null
         ));
 
         return $this->successResponse($output);

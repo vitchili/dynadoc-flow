@@ -125,7 +125,6 @@ const FilesPage: React.FC = () => {
                   <thead>
                     <tr className="border-b border-white/20">
                       <th className="text-left py-3 px-4 font-semibold">Nome do Modelo</th>
-                      <th className="text-left py-3 px-4 font-semibold">Usuário Responsável</th>
                       <th className="text-left py-3 px-4 font-semibold">Data de Geração</th>
                       <th className="text-right py-3 px-4 font-semibold">Ações</th>
                     </tr>
@@ -142,12 +141,6 @@ const FilesPage: React.FC = () => {
                               <p className="font-medium">{file.templateName || 'Modelo não encontrado'}</p>
                               <p className="text-sm text-gray-400">ID: {file.templateId}</p>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-gray-400" />
-                            <span>{file.userName || 'Usuário não encontrado'}</span>
                           </div>
                         </td>
                         <td className="py-4 px-4">

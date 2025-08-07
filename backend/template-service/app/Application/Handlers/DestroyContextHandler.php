@@ -29,7 +29,7 @@ final readonly class DestroyContextHandler
         ]);
 
         foreach ($tags as $tag) {
-            $this->tagRepository->delete($tag->id);
+            $this->tagRepository->delete($tag['id']);
         }
 
         return $this->contextRepository->delete($context->id);

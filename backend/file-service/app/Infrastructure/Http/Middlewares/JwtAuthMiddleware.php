@@ -23,6 +23,8 @@ class JwtAuthMiddleware
             return response()->json(['error' => 'Token inválido'], 401);
         }
 
+        $claims['token'] = $token;
+
         $request->attributes->set('loggedUser', $claims);
 
         return $next($request);

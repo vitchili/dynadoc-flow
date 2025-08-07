@@ -46,7 +46,7 @@ const SettingsPage: React.FC = () => {
   // Form state for tags
   const [newTagData, setNewTagData] = useState<CreateTagData>({
     name: '',
-    type: 'text',
+    type: '1',
     description: '',
     contextId: '',
     options: []
@@ -89,7 +89,7 @@ const SettingsPage: React.FC = () => {
   const resetTagForm = () => {
     setNewTagData({
       name: '',
-      type: 'text',
+      type: '1',
       description: '',
       contextId: '',
       options: []
@@ -150,8 +150,9 @@ const SettingsPage: React.FC = () => {
 
     try {
       setSaving(true);
-      const updatedTag = await api.updateTag(editingTag.id, newTagData);
-      setTags(prev => prev.map(t => t.id === editingTag.id ? updatedTag : t));
+      await api.updateTag(editingTag.id, newTagData);
+      const updatedTag = await api.getTags();
+      setTags(updatedTag);
       resetTagForm();
       setShowEditTagModal(false);
       toast({
@@ -170,7 +171,6 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleDeleteTag = async (tagId: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta tag? Esta ação não pode ser desfeita.')) return;
 
     try {
       await api.deleteTag(tagId);
@@ -415,22 +415,6 @@ const SettingsPage: React.FC = () => {
                     />
                   </div>
 
-                  {newTagData.type === 'select' && (
-                    <div>
-                      <Label htmlFor="tag-options">Opções (uma por linha)</Label>
-                      <Textarea
-                        id="tag-options"
-                        placeholder="Opção 1&#10;Opção 2&#10;Opção 3"
-                        value={newTagData.options?.join('\n') || ''}
-                        onChange={(e) => setNewTagData(prev => ({
-                          ...prev,
-                          options: e.target.value.split('\n').filter(o => o.trim())
-                        }))}
-                        className="glass bg-white/5 border-white/20"
-                      />
-                    </div>
-                  )}
-
                   <div className="flex justify-end space-x-2">
                     <Button
                       variant="outline"
@@ -445,7 +429,7 @@ const SettingsPage: React.FC = () => {
                     </Button>
                     <Button
                       onClick={handleCreateTag}
-                      disabled={!newTagData.name.trim() || !newTagData.contextId || saving}
+                      disabled={!newTagData.name.trim() || !newTagData.contextId || !newTagData.type || !newTagData.description || saving}
                       className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
                     >
                       {saving ? (
@@ -497,14 +481,36 @@ const SettingsPage: React.FC = () => {
                               >
                                 <Edit className="w-3 h-3" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteTag(tag.id)}
-                                className="h-6 w-6 p-0 text-red-400 hover:text-red-300"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                                  >
+                                    <Trash2 className="w-4 h-4 -mt-2"/>
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="glass-strong border-white/20">
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Tem certeza que deseja excluir a tag "{tag.name}"? Esta ação não pode ser desfeita.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel className="border-white/20">
+                                      Cancelar
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeleteTag(tag.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      Excluir
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                           <CardTitle className="text-sm">#{tag.name}#</CardTitle>
@@ -582,8 +588,8 @@ const SettingsPage: React.FC = () => {
                 <div>
                   <Label htmlFor="edit-tag-type">Tipo de Campo</Label>
                   <Select
-                    value={newTagData.type}
-                    onValueChange={(value: '1' | '2' | '3') => 
+                    value='1'
+                    onValueChange={(value: "1" | "2" | "3") => 
                       setNewTagData(prev => ({ ...prev, type: value }))
                     }
                   >
@@ -611,21 +617,6 @@ const SettingsPage: React.FC = () => {
                   />
                 </div>
 
-                {newTagData.type === 'select' && (
-                  <div>
-                    <Label htmlFor="edit-tag-options">Opções (uma por linha)</Label>
-                    <Textarea
-                      id="edit-tag-options"
-                      value={newTagData.options?.join('\n') || ''}
-                      onChange={(e) => setNewTagData(prev => ({
-                        ...prev,
-                        options: e.target.value.split('\n').filter(o => o.trim())
-                      }))}
-                      className="glass bg-white/5 border-white/20"
-                    />
-                  </div>
-                )}
-
                 <div className="flex justify-end space-x-2">
                   <Button
                     variant="outline"
@@ -640,7 +631,7 @@ const SettingsPage: React.FC = () => {
                   </Button>
                   <Button
                     onClick={handleUpdateTag}
-                    disabled={!newTagData.name.trim() || !newTagData.contextId || saving}
+                    disabled={!newTagData.name.trim() || !newTagData.contextId || !newTagData.type || !newTagData.description || saving}
                     className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
                   >
                     {saving ? (

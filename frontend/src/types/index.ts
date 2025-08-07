@@ -41,7 +41,7 @@ export interface Context {
 export interface Tag {
   id: string;
   name: string;
-  type: 'text' | 'number' | 'date' | 'select';
+  type: '1' | '2' | '3';
   description: string;
   contextId: string;
   context?: Context;
@@ -68,7 +68,7 @@ export interface CreateSectionData {
 
 export interface CreateTagData {
   name: string;
-  type: 'text' | 'number' | 'date' | 'select';
+  type: '1' | '2' | '3';
   description: string;
   contextId: string;
   options?: string[];
@@ -100,7 +100,6 @@ export interface GeneratedFile {
   userId: string;
   createdAt: string;
   templateName?: string;
-  userName?: string;
 }
 
 export interface GeneratedFilesResponse {

@@ -191,8 +191,8 @@ class TagRepository implements TagRepositoryInterface
             ->update([
                 'name' => $tag->name, 
                 'description' => $tag->description,
-                'type' => $tag->type->value
-
+                'type' => $tag->type->value,
+                'context_id' => $tag->contextId
             ]);
 
         return (bool) $tag;

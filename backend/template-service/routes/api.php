@@ -20,7 +20,6 @@ Route::middleware(JwtAuthMiddleware::class)->group(function () {
         Route::post('/', 'store');
         Route::patch('/{id}', 'update');
         Route::delete('/{id}', 'destroy');
-        // TODO - listar json de tags cadastradas.
     });
 
     Route::prefix('templates')->controller(TemplateController::class)->group(function () {
