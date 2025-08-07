@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Infrastructure\Repositories;
 
+use App\Domain\Entities\Context;
 use App\Domain\Entities\Tag;
 use App\Domain\Enums\TagTypeEnum;
 use App\Domain\Repositories\TagRepositoryInterface;
@@ -48,11 +49,14 @@ class TagRepository implements TagRepositoryInterface
     {
         $query = DB::table('tags')
             ->select([
-                'tags.id',
-                'tags.name',
-                'tags.description',
-                'tags.type',
-                'tags.context_id',
+                'contexts.id as contextId',
+                'contexts.name as contextName',
+                'contexts.description as contextDescription',
+                'contexts.company_id as contextCompanyId',
+                'tags.id as tagId',
+                'tags.name as tagName',
+                'tags.description as tagDescription',
+                'tags.type as tagType',
             ])
             ->join('contexts', 'tags.context_id', '=', 'contexts.id')
             ->where('contexts.company_id', app(LoggedUserHelper::class)->companyId())
@@ -73,7 +77,29 @@ class TagRepository implements TagRepositoryInterface
             })
             ->get();
 
-        return $query;
+        $outputDTO = [];
+
+        foreach ($query as $contextTags) {
+            $tag = Tag::restore(
+                id: $contextTags->tagId,
+                name: $contextTags->tagName,
+                description: $contextTags->tagDescription,
+                type: TagTypeEnum::from($contextTags->tagType),
+                contextId: $contextTags->contextId
+            )->toArray();
+            
+            $tag['typeName'] = TagTypeEnum::from($contextTags->tagType)->label();
+            $tag['context'] = [
+                'id' => $contextTags->contextId,
+                'name' => $contextTags->contextName,
+                'description' => $contextTags->contextDescription,
+                'companyId' => $contextTags->contextCompanyId,
+            ];
+
+            $outputDTO[] = $tag;
+        }
+
+        return collect($outputDTO);
     }
 
     public function findFirstUsingFilters(array $filters = []): ?Tag
@@ -144,7 +170,7 @@ class TagRepository implements TagRepositoryInterface
         );
     }
 
-    public function insert(Tag $tag): string
+     public function insert(Tag $tag): string
     {
         DB::table("tags")
             ->insert([

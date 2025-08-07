@@ -16,9 +16,8 @@ import {
   GeneratedFilesResponse
 } from '@/types';
 
-const BASE_URL = 'http://localhost:8000/api/'; // Placeholder para o backend
+const BASE_URL = 'http://localhost:8000/api/';
 
-// Simulação de token para desenvolvimento
 let authToken: string | null = localStorage.getItem('authToken');
 
 const api = {
@@ -32,29 +31,6 @@ const api = {
   },
 
   getAuthToken: () => authToken,
-
-  // async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
-  //   console.log('API: Login attempt', credentials);
-    
-  //   // Simulação de delay de rede
-  //   await new Promise(resolve => setTimeout(resolve, 1000));
-    
-  //   if (credentials.email === 'admin@example.com' && credentials.password === 'password') {
-  //     const token = 'mock-jwt-token-' + Date.now();
-  //     const user: User = {
-  //       id: '1',
-  //       email: credentials.email,
-  //       name: 'Admin User',
-  //       avatar: undefined,
-  //       company: { id: '1', name: 'Empresa Exemplo' }
-  //     };
-      
-  //     this.setAuthToken(token);
-  //     return { user, token };
-  //   }
-    
-  //   throw new Error('Credenciais inválidas');
-  // },
 
   async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
     try {
@@ -70,15 +46,22 @@ const api = {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erro ao fazer login');
       }
-
-      const data = await response.json();
       
-      // Espera-se que sua API retorne { user, token }
-      this.setAuthToken(data.token);
-      return data;
+      const apiResponse = await response.json();
+      const token = apiResponse.data.token
+
+      const user: User = {
+        id: apiResponse.data.id,
+        email: apiResponse.data.email,
+        name: apiResponse.data.name,
+        avatar: undefined,
+      };
+      
+      this.setAuthToken(apiResponse.data.token);
+      return { user, token };
+
     } catch (error) {
-      console.error('Erro na API de login:', error);
-      throw error;
+      throw new Error('Credenciais inválidas');
     }
   },
 
@@ -96,7 +79,6 @@ const api = {
       id: '1',
       email: 'admin@example.com',
       name: 'Admin User',
-      company: { id: '1', name: 'Empresa Exemplo' }
     };
   },
 
@@ -304,152 +286,181 @@ const api = {
   },
 
   // Contexts CRUD API
-  async getContexts(userId: string): Promise<Context[]> {
-    console.log('API: Get contexts for user', userId);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    return [
-      {
-        id: '1',
-        name: 'Dados Cadastrais',
-        description: 'Informações pessoais e de identificação',
-        userId
-      },
-      {
-        id: '2',
-        name: 'Dados Financeiros',
-        description: 'Informações financeiras e de pagamento',
-        userId
-      },
-      {
-        id: '3',
-        name: 'Dados Contratuais',
-        description: 'Informações específicas do contrato',
-        userId
+  async getContexts(): Promise<Context[]> {
+    try{
+      const response = await fetch(`${BASE_URL}/contexts/filters`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar contextos');
       }
-    ];
+      
+      const apiResponse = await response.json();
+
+      var data = []
+
+      apiResponse.data.forEach(element => {
+        data.push({
+          id: element.id,
+          name: element.name,
+          description: element.description
+        })
+      });
+  
+      return data
+
+    } catch (error) {
+      throw new Error('Erro ao consultar contextos');
+    }
+    
   },
 
-  async createContext(data: CreateContextData): Promise<Context> {
-    console.log('API: Create context', data);
+  async createContext(data: CreateContextData): Promise<string> {
     await new Promise(resolve => setTimeout(resolve, 600));
-    
-    return {
-      id: Date.now().toString(),
-      ...data,
-      userId: '1'
-    };
+
+    try{
+      const response = await fetch(`${BASE_URL}/contexts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar contexto');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data.id
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async updateContext(id: string, data: CreateContextData): Promise<Context> {
-    console.log('API: Update context', id, data);
+  async updateContext(id: string, data: CreateContextData): Promise<boolean> {
     await new Promise(resolve => setTimeout(resolve, 600));
-    
-    return {
-      id,
-      ...data,
-      userId: '1'
-    };
+
+    try{
+      const response = await fetch(`${BASE_URL}/contexts/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar contexto');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   async deleteContext(id: string): Promise<void> {
-    console.log('API: Delete context', id);
     await new Promise(resolve => setTimeout(resolve, 500));
+
+    try{
+      const response = await fetch(`${BASE_URL}/contexts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao excluir contexto');
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   // Tags API with Context
-  async getTags(userId: string): Promise<Tag[]> {
-    console.log('API: Get tags for user', userId);
+  async getTags(): Promise<Tag[]> {
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    return [
-      {
-        id: '1',
-        name: 'NOME_COMPLETO',
-        type: 'text',
-        description: 'Nome completo da pessoa',
-        userId,
-        contextId: '1',
-        context: {
-          id: '1',
-          name: 'Dados Cadastrais',
-          description: 'Informações pessoais e de identificação',
-          userId
-        }
-      },
-      {
-        id: '2',
-        name: 'CPF',
-        type: 'text',
-        description: 'Número do CPF',
-        userId,
-        contextId: '1',
-        context: {
-          id: '1',
-          name: 'Dados Cadastrais',
-          description: 'Informações pessoais e de identificação',
-          userId
-        }
-      },
-      {
-        id: '3',
-        name: 'DATA_ASSINATURA',
-        type: 'date',
-        description: 'Data de assinatura do contrato',
-        userId,
-        contextId: '3',
-        context: {
-          id: '3',
-          name: 'Dados Contratuais',
-          description: 'Informações específicas do contrato',
-          userId
-        }
-      },
-      {
-        id: '4',
-        name: 'VALOR',
-        type: 'number',
-        description: 'Valor monetário',
-        userId,
-        contextId: '2',
-        context: {
-          id: '2',
-          name: 'Dados Financeiros',
-          description: 'Informações financeiras e de pagamento',
-          userId
-        }
-      },
-      {
-        id: '5',
-        name: 'EMPRESA',
-        type: 'text',
-        description: 'Nome da empresa',
-        userId,
-        contextId: '1',
-        context: {
-          id: '1',
-          name: 'Dados Cadastrais',
-          description: 'Informações pessoais e de identificação',
-          userId
-        }
+     try{
+      const response = await fetch(`${BASE_URL}/tags/filters`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar tags');
       }
-    ];
+      
+      const apiResponse = await response.json();
+
+      var data = []
+
+      apiResponse.data.forEach(element => {
+        data.push({
+          id: element.id,
+          name: element.name,
+          type: element.typeName,
+          description: element.description,
+          contextId: element.contextId,
+          context: {
+            id: element.context.id,
+            name: element.context.name,
+            description: element.context.description,
+          }
+        })
+      });
+  
+      return data
+
+    } catch (error) {
+      throw new Error('Erro ao consultar contextos');
+    }
   },
 
-  async createTag(data: CreateTagData): Promise<Tag> {
-    console.log('API: Create tag', data);
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Simulate finding the context
-    const contexts = await this.getContexts('1');
-    const context = contexts.find(c => c.id === data.contextId);
-    
-    return {
-      id: Date.now().toString(),
-      ...data,
-      userId: '1',
-      context
-    };
+  async createTag(data: CreateTagData): Promise<string> {
+    try{
+      const response = await fetch(`${BASE_URL}/tags`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar tag');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data.id
+
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   async updateTag(id: string, data: CreateTagData): Promise<Tag> {
@@ -463,7 +474,6 @@ const api = {
     return {
       id,
       ...data,
-      userId: '1',
       context
     };
   },
@@ -491,7 +501,6 @@ const api = {
       id: '1',
       email: data.email || 'admin@example.com',
       name: 'Admin User',
-      company: { id: '1', name: 'Empresa Exemplo' }
     };
   },
 

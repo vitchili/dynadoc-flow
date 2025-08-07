@@ -6,6 +6,17 @@ import api from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -59,8 +70,8 @@ const SettingsPage: React.FC = () => {
     try {
       setLoading(true);
       const [tagsData, contextsData] = await Promise.all([
-        api.getTags(user.id),
-        api.getContexts(user.id)
+        api.getTags(),
+        api.getContexts()
       ]);
       setTags(tagsData);
       setContexts(contextsData);
@@ -99,11 +110,12 @@ const SettingsPage: React.FC = () => {
 
     try {
       setSaving(true);
-      const tag = await api.createTag({
+      await api.createTag({
         ...newTagData,
         name: newTagData.name.toUpperCase().replace(/\s+/g, '_')
       });
-      setTags(prev => [...prev, tag]);
+      const updatedTags = await api.getTags();
+      setTags(updatedTags);
       resetTagForm();
       setShowNewTagModal(false);
       toast({
@@ -182,8 +194,9 @@ const SettingsPage: React.FC = () => {
 
     try {
       setSaving(true);
-      const context = await api.createContext(newContextData);
-      setContexts(prev => [...prev, context]);
+      await api.createContext(newContextData);
+      const updatedContext = await api.getContexts();
+      setContexts(updatedContext);
       resetContextForm();
       setShowNewContextModal(false);
       toast({
@@ -235,12 +248,6 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleDeleteContext = async (contextId: string) => {
-    const relatedTags = tags.filter(tag => tag.contextId === contextId);
-    if (relatedTags.length > 0) {
-      if (!confirm(`Este contexto possui ${relatedTags.length} tag(s) associada(s). Tem certeza que deseja excluir? As tags também serão removidas.`)) return;
-    } else {
-      if (!confirm('Tem certeza que deseja excluir este contexto? Esta ação não pode ser desfeita.')) return;
-    }
 
     try {
       await api.deleteContext(contextId);
@@ -261,20 +268,18 @@ const SettingsPage: React.FC = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'text': return 'bg-blue-500/20 text-blue-300';
-      case 'number': return 'bg-green-500/20 text-green-300';
-      case 'date': return 'bg-purple-500/20 text-purple-300';
-      case 'select': return 'bg-orange-500/20 text-orange-300';
+      case '1': return 'bg-blue-500/20 text-blue-300';
+      case '2': return 'bg-green-500/20 text-green-300';
+      case '3': return 'bg-purple-500/20 text-purple-300';
       default: return 'bg-gray-500/20 text-gray-300';
     }
   };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'text': return 'Texto';
-      case 'number': return 'Número';
-      case 'date': return 'Data';
-      case 'select': return 'Seleção';
+      case '1': return 'Texto';
+      case '2': return 'Número';
+      case '3': return 'Data';
       default: return type;
     }
   };
@@ -381,7 +386,7 @@ const SettingsPage: React.FC = () => {
                     <Label htmlFor="tag-type">Tipo de Campo</Label>
                     <Select
                       value={newTagData.type}
-                      onValueChange={(value: 'text' | 'number' | 'date' | 'select') => 
+                      onValueChange={(value: '1' | '2' | '3') => 
                         setNewTagData(prev => ({ ...prev, type: value }))
                       }
                     >
@@ -389,10 +394,9 @@ const SettingsPage: React.FC = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="glass-strong border-white/20">
-                        <SelectItem value="text">Texto</SelectItem>
-                        <SelectItem value="number">Número</SelectItem>
-                        <SelectItem value="date">Data</SelectItem>
-                        <SelectItem value="select">Seleção</SelectItem>
+                        <SelectItem value="1">Texto</SelectItem>
+                        <SelectItem value="2">Número</SelectItem>
+                        <SelectItem value="3">Data</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -579,7 +583,7 @@ const SettingsPage: React.FC = () => {
                   <Label htmlFor="edit-tag-type">Tipo de Campo</Label>
                   <Select
                     value={newTagData.type}
-                    onValueChange={(value: 'text' | 'number' | 'date' | 'select') => 
+                    onValueChange={(value: '1' | '2' | '3') => 
                       setNewTagData(prev => ({ ...prev, type: value }))
                     }
                   >
@@ -587,10 +591,9 @@ const SettingsPage: React.FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="glass-strong border-white/20">
-                      <SelectItem value="text">Texto</SelectItem>
-                      <SelectItem value="number">Número</SelectItem>
-                      <SelectItem value="date">Data</SelectItem>
-                      <SelectItem value="select">Seleção</SelectItem>
+                      <SelectItem value="1">Texto</SelectItem>
+                      <SelectItem value="2">Número</SelectItem>
+                      <SelectItem value="3">Data</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -768,14 +771,36 @@ const SettingsPage: React.FC = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteContext(context.id)}
-                            className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="glass-strong border-white/20">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir o contexto "{context.name}"? Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="border-white/20">
+                                  Cancelar
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteContext(context.id)}
+                                  className="bg-red-600 hover:bg-red-700"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                       <CardDescription className="text-gray-300">

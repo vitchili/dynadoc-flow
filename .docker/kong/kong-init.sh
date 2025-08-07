@@ -20,15 +20,19 @@ curl -i -X POST http://kong:8001/services \
   --data url=http://template-nginx:80
 
 curl -i -X POST http://kong:8001/services/template-service/routes \
-  --data 'paths[]=/api'
+  --data 'paths[]=/api/contexts' \
+  --data 'paths[]=/api/tags' \
+  --data 'paths[]=/api/templates' \
+  --data 'paths[]=/api/sections' \
+  --data 'strip_path=false'
 
-curl -i -X POST http://kong:8001/services/template-service/routes \
-  --data 'paths[]=/api'
+# FILE SERVICE
+curl -i -X POST http://kong:8001/services \
+  --data name=file-service \
+  --data url=http://file-nginx:80
 
-curl -i -X POST http://kong:8001/services/template-service/routes \
-  --data 'paths[]=/api'
-
-curl -i -X POST http://kong:8001/services/template-service/routes \
-  --data 'paths[]=/api'
+curl -i -X POST http://kong:8001/services/file-service/routes \
+  --data 'paths[]=/api/files' \
+  --data 'strip_path=false'
 
 echo "Rotas registradas com sucesso!"

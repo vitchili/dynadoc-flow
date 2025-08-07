@@ -63,7 +63,18 @@ class ContextRepository implements ContextRepositoryInterface
             })
             ->get();
 
-        return $query;
+        $outputDTO = [];
+
+        foreach ($query as $context) {
+            $outputDTO[] = Context::restore(
+                id: $context->id,
+                name: $context->name,
+                description: $context->description,
+                companyId: $context->company_id
+            );
+        }
+
+        return collect($outputDTO);
     }
 
     public function findFirstUsingFilters(array $filters = []): ?Context

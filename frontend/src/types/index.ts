@@ -4,7 +4,6 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
-  company?: Company;
 }
 
 export interface Company {
@@ -37,7 +36,6 @@ export interface Context {
   id: string;
   name: string;
   description?: string;
-  userId: string;
 }
 
 export interface Tag {
@@ -45,7 +43,6 @@ export interface Tag {
   name: string;
   type: 'text' | 'number' | 'date' | 'select';
   description: string;
-  userId: string;
   contextId: string;
   context?: Context;
   options?: string[];

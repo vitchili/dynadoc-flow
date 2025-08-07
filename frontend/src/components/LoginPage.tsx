@@ -81,9 +81,9 @@ const LoginPage: React.FC = () => {
             <div className="mx-auto w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
               <FileText className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl gradient-text">ContractGen</CardTitle>
+            <CardTitle className="text-2xl gradient-text">DynaDocument</CardTitle>
             <CardDescription className="text-gray-300">
-              Entre para gerenciar seus contratos
+              Entre para gerenciar seus documentos
             </CardDescription>
             <div className="mt-2 text-sm text-gray-400 bg-blue-500/10 p-2 rounded border border-blue-500/20">
               <strong>Demo:</strong> admin@example.com / password
