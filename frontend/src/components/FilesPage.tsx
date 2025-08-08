@@ -32,7 +32,7 @@ const FilesPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const response = await api.getGeneratedFiles(user.id, currentPage, 10);
+      const response = await api.getGeneratedFiles(currentPage, 10);
       setFilesData(response);
     } catch (error) {
       toast({
@@ -107,7 +107,7 @@ const FilesPage: React.FC = () => {
               Histórico de Arquivos
             </CardTitle>
             <CardDescription>
-              Lista de todos os arquivos gerados a partir dos seus modelos de contrato
+              Lista de todos os arquivos gerados a partir dos seus modelos de template
             </CardDescription>
           </CardHeader>
           <CardContent>

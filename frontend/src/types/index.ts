@@ -11,25 +11,20 @@ export interface Company {
   name: string;
 }
 
-export interface Contract {
+export interface Template {
   id: string;
   name: string;
   description: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
   sections: Section[];
 }
 
 export interface Section {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  content: string;
-  order: number;
-  contractId: string;
-  createdAt: string;
-  updatedAt: string;
+  htmlContent: string;
+  sectionOrder: number;
+  templateId: string;
 }
 
 export interface Context {
@@ -54,16 +49,16 @@ export interface LoginCredentials {
   rememberMe?: boolean;
 }
 
-export interface CreateContractData {
+export interface CreateTemplateData {
   name: string;
   description: string;
 }
 
 export interface CreateSectionData {
-  title: string;
+  name: string;
   description: string;
-  content: string;
-  contractId: string;
+  htmlContent: string;
+  templateId: string;
 }
 
 export interface CreateTagData {
@@ -87,8 +82,8 @@ export interface UpdateProfileData {
   password?: string;
 }
 
-export interface ContractsResponse {
-  contracts: Contract[];
+export interface TemplatesResponse {
+  templates: Template[];
   total: number;
   page: number;
   totalPages: number;

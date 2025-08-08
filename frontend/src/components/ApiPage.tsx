@@ -62,8 +62,8 @@ const ApiPage: React.FC = () => {
             </h1>
           </div>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Utilize esta documentação para integrar a geração de contratos em suas aplicações.
-            Envie os dados via JSON para gerar múltiplos contratos dinamicamente.
+            Utilize esta documentação para integrar a geração de templates em suas aplicações.
+            Envie os dados via JSON para gerar múltiplos templates dinamicamente.
           </p>
         </div>
 
@@ -76,20 +76,20 @@ const ApiPage: React.FC = () => {
                 <span>Endpoint de Geração</span>
               </CardTitle>
               <CardDescription>
-                Informações sobre o endpoint para gerar contratos
+                Informações sobre o endpoint para gerar templates
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-gray-900/50 p-4 rounded-lg">
                 <p className="text-green-400 font-mono text-sm">
-                  POST /contracts/generate
+                  POST /templates/generate
                 </p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-purple-300">Descrição:</h4>
                 <p className="text-gray-300">
                   Este endpoint recebe um array de objetos JSON, onde cada objeto representa os dados
-                  para gerar um contrato. As chaves devem corresponder aos nomes das tags cadastradas,
+                  para gerar um template. As chaves devem corresponder aos nomes das tags cadastradas,
                   e os valores são os dados reais que substituirão as tags no documento.
                 </p>
               </div>
@@ -185,7 +185,7 @@ const ApiPage: React.FC = () => {
                   <div>
                     <h4 className="font-semibold text-white">Envie a requisição</h4>
                     <p className="text-gray-400 text-sm">
-                      Faça uma requisição POST para /contracts/generate com o array JSON preenchido.
+                      Faça uma requisição POST para /templates/generate com o array JSON preenchido.
                     </p>
                   </div>
                 </div>

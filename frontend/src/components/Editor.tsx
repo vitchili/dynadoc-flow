@@ -34,13 +34,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tag } from '@/types';
 
 interface EditorProps {
-  content: string;
-  onChange: (content: string) => void;
+  htmlContent: string;
+  onChange: (htmlContent: string) => void;
   tags: Tag[];
   placeholder?: string;
 }
 
-const Editor: React.FC<EditorProps> = ({ content, onChange, tags, placeholder = 'Digite seu conteúdo...' }) => {
+const Editor: React.FC<EditorProps> = ({ htmlContent, onChange, tags, placeholder = 'Digite seu conteúdo...' }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [showTagMenu, setShowTagMenu] = useState(false);
   const [tagSearchQuery, setTagSearchQuery] = useState('');
@@ -48,10 +48,10 @@ const Editor: React.FC<EditorProps> = ({ content, onChange, tags, placeholder = 
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
 
   useEffect(() => {
-    if (editorRef.current && content !== editorRef.current.innerHTML) {
-      editorRef.current.innerHTML = content;
+    if (editorRef.current && htmlContent !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = htmlContent;
     }
-  }, [content]);
+  }, [htmlContent]);
 
   const execCommand = (command: string, value?: string) => {
     document.execCommand(command, false, value);

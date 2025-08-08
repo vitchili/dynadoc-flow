@@ -90,7 +90,7 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
             <GripVertical className="w-4 h-4 text-gray-400" />
           </div>
           <div className="flex-1">
-            <h4 className="font-medium text-gray-100">{section.title}</h4>
+            <h4 className="font-medium text-gray-100">{section.name}</h4>
             {section.description && (
               <p className="text-sm text-gray-400 mt-1">{section.description}</p>
             )}

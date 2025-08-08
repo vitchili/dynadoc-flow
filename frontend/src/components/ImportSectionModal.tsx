@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Contract, Section } from '@/types';
+import { Template, Section } from '@/types';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,44 +14,44 @@ import { Search, Loader2, FileText } from 'lucide-react';
 interface ImportSectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  targetContract: Contract;
+  targetTemplate: Template;
   onImportComplete: () => void;
 }
 
 const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
   isOpen,
   onClose,
-  targetContract,
+  targetTemplate,
   onImportComplete
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(false);
   const [sectionsLoading, setSectionsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (isOpen && user) {
-      loadContracts();
+      loadTemplates();
     }
   }, [isOpen, user]);
 
-  const loadContracts = async () => {
+  const loadTemplates = async () => {
     if (!user) return;
     
     try {
       setLoading(true);
-      const response = await api.getContracts(user.id, 1, 100); // Get all contracts for selection
-      const availableContracts = response.contracts.filter(c => c.id !== targetContract.id);
-      setContracts(availableContracts);
+      const response = await api.getTemplates(1, 100); // Get all templates for selection
+      const availableTemplates = response.templates.filter(c => c.id !== targetTemplate.id);
+      setTemplates(availableTemplates);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível carregar os contratos disponíveis.",
+        description: "Não foi possível carregar os templates disponíveis.",
         variant: "destructive",
       });
     } finally {
@@ -59,15 +59,15 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
     }
   };
 
-  const loadSections = async (contractId: string) => {
+  const loadSections = async (templateId: string) => {
     try {
       setSectionsLoading(true);
-      const sectionsData = await api.getSections(contractId);
+      const sectionsData = await api.getSections(templateId);
       setSections(sectionsData);
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível carregar as seções do contrato selecionado.",
+        description: "Não foi possível carregar as seções do template selecionado.",
         variant: "destructive",
       });
     } finally {
@@ -75,9 +75,9 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
     }
   };
 
-  const handleContractSelect = async (contract: Contract) => {
-    setSelectedContract(contract);
-    await loadSections(contract.id);
+  const handleTemplateSelect = async (template: Template) => {
+    setSelectedTemplate(template);
+    await loadSections(template.id);
   };
 
   const handleSectionToggle = (sectionId: string) => {
@@ -91,10 +91,10 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
   };
 
   const handleImport = async () => {
-    if (!selectedContract) {
+    if (!selectedTemplate) {
       toast({
         title: "Atenção",
-        description: "Selecione um contrato para importar as seções.",
+        description: "Selecione um template para importar as seções.",
       });
       return;
     }
@@ -109,7 +109,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
 
     try {
       setLoading(true);
-      await api.importSections(targetContract.id, selectedSections);
+      await api.importSections(targetTemplate.id, selectedSections);
       toast({
         title: "Sucesso",
         description: "Seções importadas com sucesso!",
@@ -128,14 +128,14 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
   };
 
   const handleClose = () => {
-    setSelectedContract(null);
+    setSelectedTemplate(null);
     setSections([]);
     setSelectedSections([]);
     onClose();
   };
 
-  const filteredContracts = contracts.filter(contract =>
-    contract.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTemplates = templates.filter(template =>
+    template.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -144,20 +144,20 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
         <DialogHeader>
           <DialogTitle>Importar Seções</DialogTitle>
           <DialogDescription>
-            Selecione um contrato e as seções que deseja importar para "{targetContract.name}"
+            Selecione um template e as seções que deseja importar para "{targetTemplate.name}"
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Search Contracts */}
+          {/* Search Templates */}
           <div>
-            <Label htmlFor="search-contracts">Pesquisar Contratos</Label>
+            <Label htmlFor="search-templates">Pesquisar Templates</Label>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
                 type="text"
-                id="search-contracts"
-                placeholder="Digite o nome do contrato..."
+                id="search-templates"
+                placeholder="Digite o nome do template..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 glass bg-white/5 border-white/20"
@@ -168,23 +168,23 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
           {loading ? (
             <div className="flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
-              Carregando contratos...
+              Carregando templates...
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredContracts.length === 0 ? (
-                <p className="text-gray-400">Nenhum contrato encontrado.</p>
+              {filteredTemplates.length === 0 ? (
+                <p className="text-gray-400">Nenhum template encontrado.</p>
               ) : (
-                filteredContracts.map(contract => (
+                filteredTemplates.map(template => (
                   <Button
-                    key={contract.id}
+                    key={template.id}
                     variant="outline"
-                    className={`w-full justify-start border-white/20 ${selectedContract?.id === contract.id ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/5'}`}
-                    onClick={() => handleContractSelect(contract)}
+                    className={`w-full justify-start border-white/20 ${selectedTemplate?.id === template.id ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/5'}`}
+                    onClick={() => handleTemplateSelect(template)}
                     disabled={loading}
                   >
                     <FileText className="w-4 h-4 mr-2" />
-                    {contract.name}
+                    {template.name}
                   </Button>
                 ))
               )}
@@ -192,16 +192,16 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
           )}
 
           {/* Sections List */}
-          {selectedContract && (
+          {selectedTemplate && (
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold">Seções do Contrato</h3>
+              <h3 className="text-lg font-semibold">Seções do Template</h3>
               {sectionsLoading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="w-6 h-6 animate-spin mr-2" />
                   Carregando seções...
                 </div>
               ) : sections.length === 0 ? (
-                <p className="text-gray-400">Nenhuma seção encontrada neste contrato.</p>
+                <p className="text-gray-400">Nenhuma seção encontrada neste template.</p>
               ) : (
                 sections.map(section => (
                   <div key={section.id} className="flex items-center space-x-2">
@@ -212,7 +212,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
                       disabled={loading}
                     />
                     <Label htmlFor={`section-${section.id}`} className="text-sm">
-                      {section.title}
+                      {section.name}
                     </Label>
                   </div>
                 ))

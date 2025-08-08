@@ -13,14 +13,14 @@ const BatchPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedContractIds, setSelectedContractIds] = useState<string[]>([]);
+  const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [showContractSelector, setShowContractSelector] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
-  const { data: contractsData, isLoading: contractsLoading } = useQuery({
-    queryKey: ['contracts', user?.id],
-    queryFn: () => user ? api.getContracts(user.id) : Promise.resolve({ contracts: [] }),
+  const { data: templatesData, isLoading: templatesLoading } = useQuery({
+    queryKey: ['templates', user?.id],
+    queryFn: () => user ? api.getTemplates(user.id) : Promise.resolve({ templates: [] }),
     enabled: !!user
   });
 
@@ -82,30 +82,30 @@ const BatchPage: React.FC = () => {
     });
   };
 
-  const handleContractToggle = (contractId: string) => {
-    setSelectedContractIds(prev => 
-      prev.includes(contractId)
-        ? prev.filter(id => id !== contractId)
-        : [...prev, contractId]
+  const handleTemplateToggle = (templateId: string) => {
+    setSelectedTemplateIds(prev => 
+      prev.includes(templateId)
+        ? prev.filter(id => id !== templateId)
+        : [...prev, templateId]
     );
   };
 
-  const handleRemoveContract = (contractId: string) => {
-    setSelectedContractIds(prev => prev.filter(id => id !== contractId));
+  const handleRemoveTemplate = (templateId: string) => {
+    setSelectedTemplateIds(prev => prev.filter(id => id !== templateId));
   };
 
-  const getSelectedContracts = () => {
-    if (!contractsData?.contracts) return [];
-    return contractsData.contracts.filter(contract => 
-      selectedContractIds.includes(contract.id)
+  const getSelectedTemplates = () => {
+    if (!templatesData?.templates) return [];
+    return templatesData.templates.filter(template => 
+      selectedTemplateIds.includes(template.id)
     );
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile || selectedContractIds.length === 0) {
+    if (!selectedFile || selectedTemplateIds.length === 0) {
       toast({
         title: "Dados incompletos",
-        description: "Selecione um arquivo Excel e pelo menos um contrato.",
+        description: "Selecione um arquivo Excel e pelo menos um template.",
         variant: "destructive"
       });
       return;
@@ -113,15 +113,15 @@ const BatchPage: React.FC = () => {
 
     setIsUploading(true);
     try {
-      await api.processBatchContracts(selectedContractIds, selectedFile);
+      await api.processBatchTemplates(selectedTemplateIds, selectedFile);
       toast({
         title: "Processamento iniciado",
-        description: "Os contratos estão sendo gerados. O download será iniciado em breve."
+        description: "Os templates estão sendo gerados. O download será iniciado em breve."
       });
       
       // Reset form
       setSelectedFile(null);
-      setSelectedContractIds([]);
+      setSelectedTemplateIds([]);
     } catch (error) {
       toast({
         title: "Erro no processamento",
@@ -144,8 +144,8 @@ const BatchPage: React.FC = () => {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Processamento em Lote</h1>
           <p className="text-muted-foreground">
-            Gere múltiplos contratos automaticamente através de uma planilha Excel. 
-            Faça upload do arquivo com os dados e selecione os modelos de contrato desejados.
+            Gere múltiplos templates automaticamente através de uma planilha Excel. 
+            Faça upload do arquivo com os dados e selecione os modelos de template desejados.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ const BatchPage: React.FC = () => {
                 <span>Upload do Arquivo Excel</span>
               </CardTitle>
               <CardDescription>
-                Faça upload de um arquivo .xlsx ou .xls com os dados para gerar os contratos (máximo 10MB)
+                Faça upload de um arquivo .xlsx ou .xls com os dados para gerar os templates (máximo 10MB)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -214,33 +214,33 @@ const BatchPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Contract Selection */}
+          {/* Template Selection */}
           <Card>
             <CardHeader>
-              <CardTitle>Modelos de Contrato</CardTitle>
+              <CardTitle>Modelos de Template</CardTitle>
               <CardDescription>
-                Selecione os contratos que serão usados como modelo para gerar os documentos
+                Selecione os templates que serão usados como modelo para gerar os documentos
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {contractsLoading ? (
+              {templatesLoading ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  <span className="ml-2">Carregando contratos...</span>
+                  <span className="ml-2">Carregando templates...</span>
                 </div>
               ) : (
                 <>
-                  {/* Selected Contracts */}
-                  {selectedContractIds.length > 0 && (
+                  {/* Selected Templates */}
+                  {selectedTemplateIds.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Contratos selecionados:</p>
+                      <p className="text-sm font-medium">Templates selecionados:</p>
                       <div className="flex flex-wrap gap-2">
-                        {getSelectedContracts().map((contract) => (
-                          <Badge key={contract.id} variant="secondary" className="flex items-center gap-1">
-                            {contract.name}
+                        {getSelectedTemplates().map((template) => (
+                          <Badge key={template.id} variant="secondary" className="flex items-center gap-1">
+                            {template.name}
                             <X 
                               className="w-3 h-3 cursor-pointer hover:text-destructive" 
-                              onClick={() => handleRemoveContract(contract.id)}
+                              onClick={() => handleRemoveTemplate(template.id)}
                             />
                           </Badge>
                         ))}
@@ -248,41 +248,41 @@ const BatchPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Contract Selector */}
+                  {/* Template Selector */}
                   <div className="space-y-2">
                     <Button
                       variant="outline"
-                      onClick={() => setShowContractSelector(!showContractSelector)}
+                      onClick={() => setShowTemplateSelector(!showTemplateSelector)}
                       className="w-full justify-start"
                     >
-                      {showContractSelector ? 'Ocultar contratos' : 'Selecionar contratos'}
+                      {showTemplateSelector ? 'Ocultar templates' : 'Selecionar templates'}
                     </Button>
 
-                    {showContractSelector && (
+                    {showTemplateSelector && (
                       <div className="border rounded-lg p-4 space-y-2 max-h-60 overflow-y-auto">
-                        {contractsData?.contracts.map((contract) => (
+                        {templatesData?.templates.map((template) => (
                           <div
-                            key={contract.id}
+                            key={template.id}
                             className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedContractIds.includes(contract.id)
+                              selectedTemplateIds.includes(template.id)
                                 ? 'bg-primary/10 border-primary'
                                 : 'hover:bg-muted border-border'
                             }`}
-                            onClick={() => handleContractToggle(contract.id)}
+                            onClick={() => handleTemplateToggle(template.id)}
                           >
                             <div className="flex items-center space-x-2">
                               <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                                selectedContractIds.includes(contract.id)
+                                selectedTemplateIds.includes(template.id)
                                   ? 'bg-primary border-primary'
                                   : 'border-border'
                               }`}>
-                                {selectedContractIds.includes(contract.id) && (
+                                {selectedTemplateIds.includes(template.id) && (
                                   <CheckCircle className="w-3 h-3 text-primary-foreground" />
                                 )}
                               </div>
                               <div>
-                                <p className="font-medium">{contract.name}</p>
-                                <p className="text-sm text-muted-foreground">{contract.description}</p>
+                                <p className="font-medium">{template.name}</p>
+                                <p className="text-sm text-muted-foreground">{template.description}</p>
                               </div>
                             </div>
                           </div>
@@ -299,7 +299,7 @@ const BatchPage: React.FC = () => {
           <div className="flex justify-center">
             <Button
               onClick={handleSubmit}
-              disabled={!selectedFile || selectedContractIds.length === 0 || isUploading}
+              disabled={!selectedFile || selectedTemplateIds.length === 0 || isUploading}
               size="lg"
               className="px-8"
             >
@@ -311,7 +311,7 @@ const BatchPage: React.FC = () => {
               ) : (
                 <>
                   <FileSpreadsheet className="w-4 h-4 mr-2" />
-                  Gerar Contratos em Lote
+                  Gerar Templates em Lote
                 </>
               )}
             </Button>
@@ -325,10 +325,10 @@ const BatchPage: React.FC = () => {
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium text-foreground mb-2">Como funciona:</p>
                   <ul className="space-y-1 list-disc list-inside">
-                    <li>Faça upload de uma planilha Excel com os dados dos contratos</li>
-                    <li>Selecione os modelos de contrato que serão usados</li>
-                    <li>O sistema gerará um contrato para cada linha da planilha usando cada modelo selecionado</li>
-                    <li>Todos os contratos serão compactados em um arquivo ZIP para download</li>
+                    <li>Faça upload de uma planilha Excel com os dados dos templates</li>
+                    <li>Selecione os modelos de template que serão usados</li>
+                    <li>O sistema gerará um template para cada linha da planilha usando cada modelo selecionado</li>
+                    <li>Todos os templates serão compactados em um arquivo ZIP para download</li>
                   </ul>
                 </div>
               </div>

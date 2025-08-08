@@ -1,17 +1,17 @@
 import { 
   User, 
-  Contract, 
+  Template, 
   Section, 
   Tag, 
   Context,
   Company, 
   LoginCredentials, 
-  CreateContractData, 
+  CreateTemplateData, 
   CreateSectionData, 
   CreateTagData,
   CreateContextData,
   UpdateProfileData,
-  ContractsResponse,
+  TemplatesResponse,
   GeneratedFile,
   GeneratedFilesResponse
 } from '@/types';
@@ -82,200 +82,274 @@ const api = {
     };
   },
 
-  async getContracts(userId: string, page: number = 1, limit: number = 10): Promise<ContractsResponse> {
-    console.log('API: Get contracts for user', userId, 'page:', page);
+  async getTemplates(page: number = 1, limit: number = 10): Promise<TemplatesResponse> {
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    const allContracts = [
-      {
-        id: '1',
-        name: 'Contrato de Prestação de Serviços',
-        description: 'Modelo padrão para prestação de serviços',
-        createdAt: '2024-01-15T10:00:00Z',
-        updatedAt: '2024-01-15T10:00:00Z',
-        userId,
-        sections: []
-      },
-      {
-        id: '2',
-        name: 'Contrato de Trabalho',
-        description: 'Modelo para contratação de funcionários',
-        createdAt: '2024-01-10T14:30:00Z',
-        updatedAt: '2024-01-10T14:30:00Z',
-        userId,
-        sections: []
-      },
-      {
-        id: '3',
-        name: 'Contrato de Locação',
-        description: 'Modelo para locação de imóveis',
-        createdAt: '2024-01-08T09:15:00Z',
-        updatedAt: '2024-01-08T09:15:00Z',
-        userId,
-        sections: []
+    try{
+      const response = await fetch(`${BASE_URL}/templates/filters`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar templates');
       }
-    ];
+      
+      const apiResponse = await response.json();
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const contracts = allContracts.slice(startIndex, endIndex);
+      var allTemplates = []
 
-    return {
-      contracts,
-      total: allContracts.length,
-      page,
-      totalPages: Math.ceil(allContracts.length / limit)
-    };
+      apiResponse.data.forEach(element => {
+        allTemplates.push({
+          id: element.id,
+          name: element.name,
+          description: element.description,
+          sections: []
+        })
+      });
+  
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const templates = allTemplates.slice(startIndex, endIndex);
+
+      return {
+        templates,
+        total: allTemplates.length,
+        page,
+        totalPages: Math.ceil(allTemplates.length / limit)
+      };
+
+    } catch (error) {
+      throw new Error('Erro ao consultar templates');
+    }
   },
 
-  async filterContracts(userId: string, query: string, page: number = 1, limit: number = 10): Promise<ContractsResponse> {
-    console.log('API: Filter contracts', userId, query, 'page:', page);
+  async filterTemplates(query: string, page: number = 1, limit: number = 10): Promise<TemplatesResponse> {
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    const allContracts = [
-      {
-        id: '1',
-        name: 'Contrato de Prestação de Serviços',
-        description: 'Modelo padrão para prestação de serviços',
-        createdAt: '2024-01-15T10:00:00Z',
-        updatedAt: '2024-01-15T10:00:00Z',
-        userId,
-        sections: []
-      },
-      {
-        id: '2',
-        name: 'Contrato de Trabalho',
-        description: 'Modelo para contratação de funcionários',
-        createdAt: '2024-01-10T14:30:00Z',
-        updatedAt: '2024-01-10T14:30:00Z',
-        userId,
-        sections: []
-      },
-      {
-        id: '3',
-        name: 'Contrato de Locação',
-        description: 'Modelo para locação de imóveis',
-        createdAt: '2024-01-08T09:15:00Z',
-        updatedAt: '2024-01-08T09:15:00Z',
-        userId,
-        sections: []
+    try{
+      const response = await fetch(`${BASE_URL}/templates/filters`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar templates');
       }
-    ];
+      
+      const apiResponse = await response.json();
 
-    const filteredContracts = allContracts.filter(contract => 
-      contract.name.toLowerCase().includes(query.toLowerCase())
-    );
+      var allTemplates = []
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const contracts = filteredContracts.slice(startIndex, endIndex);
+      apiResponse.data.forEach(element => {
+        allTemplates.push({
+          id: element.id,
+          name: element.name,
+          description: element.description,
+          sections: []
+        })
+      });
 
-    return {
-      contracts,
-      total: filteredContracts.length,
-      page,
-      totalPages: Math.ceil(filteredContracts.length / limit)
-    };
+      const filteredTemplates = allTemplates.filter(template => 
+        template.name.toLowerCase().includes(query.toLowerCase())
+      );
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const templates = filteredTemplates.slice(startIndex, endIndex);
+
+      return {
+        templates,
+        total: filteredTemplates.length,
+        page,
+        totalPages: Math.ceil(filteredTemplates.length / limit)
+      };
+    } catch (error) {
+      throw new Error('Erro ao consultar templates');
+    }
   },
 
-  async createContract(data: CreateContractData): Promise<Contract> {
-    console.log('API: Create contract', data);
+  async createTemplate(data: CreateTemplateData): Promise<string> {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    return {
-      id: Date.now().toString(),
-      ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      userId: '1',
-      sections: []
-    };
+    try{
+      const response = await fetch(`${BASE_URL}/templates`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar template');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data.id
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async updateContract(id: string, data: Partial<CreateContractData>): Promise<Contract> {
-    console.log('API: Update contract', id, data);
+  async updateTemplate(id: string, data: Partial<CreateTemplateData>): Promise<Template> {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      id,
-      name: data.name || 'Contract Name',
-      description: data.description || 'Contract Description',
-      userId: '1',
-      createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-      updatedAt: new Date().toISOString(),
-      sections: []
-    };
+    console.log(data);
+    try{
+      const response = await fetch(`${BASE_URL}/templates/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar template');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async deleteContract(id: string): Promise<void> {
-    console.log('API: Delete contract', id);
+  async deleteTemplate(id: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 800));
+
+    try{
+      const response = await fetch(`${BASE_URL}/templates/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao excluir templates');
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async downloadContractExample(id: string): Promise<void> {
-    console.log('API: Download contract example', id);
+  async downloadTemplateExample(id: string): Promise<void> {
+    console.log('API: Download template example', id);
     await new Promise(resolve => setTimeout(resolve, 1000));
   },
 
-  async getSections(contractId: string): Promise<Section[]> {
-    console.log('API: Get sections for contract', contractId);
+  async getSections(templateId: string): Promise<Section[]> {
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    return [
-      {
-        id: '1',
-        title: 'Cláusulas Gerais',
-        description: 'Estabelece as condições gerais entre as partes contratantes',
-        content: '<p>Este contrato estabelece as condições gerais entre as partes <span class="tag-placeholder">#NOME_COMPLETO#</span> e <span class="tag-placeholder">#EMPRESA#</span>.</p>',
-        order: 1,
-        contractId,
-        createdAt: '2024-01-15T10:00:00Z',
-        updatedAt: '2024-01-15T10:00:00Z'
-      },
-      {
-        id: '2',
-        title: 'Pagamento',
-        description: 'Define valores, prazos e condições de pagamento',
-        content: '<p>O valor a ser pago é de <span class="tag-placeholder">#VALOR#</span> até a data <span class="tag-placeholder">#DATA_VENCIMENTO#</span>.</p>',
-        order: 2,
-        contractId,
-        createdAt: '2024-01-15T10:05:00Z',
-        updatedAt: '2024-01-15T10:05:00Z'
+    try{
+      const response = await fetch(`${BASE_URL}/sections/filters?templateId=${templateId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao buscar seções');
       }
-    ];
+      
+      const apiResponse = await response.json();
+
+      var data = []
+
+      apiResponse.data.forEach(element => {
+        data.push({
+          id: element.id,
+          name: element.name,
+          description: element.description,
+          templateId: element.templateId,
+          htmlContent: element.htmlContent,
+          sectionOrder: element.sectionOrder
+        })
+      });
+
+      data.sort((a, b) => a.sectionOrder - b.sectionOrder);
+  
+      return data
+
+    } catch (error) {
+      throw new Error('Erro ao consultar contextos');
+    }
   },
 
-  async createSection(data: CreateSectionData): Promise<Section> {
-    console.log('API: Create section', data);
+  async createSection(data: CreateSectionData): Promise<string> {
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    return {
-      id: Date.now().toString(),
-      ...data,
-      order: 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    try{
+      const response = await fetch(`${BASE_URL}/sections`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar seção');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data.id
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async updateSection(id: string, data: Partial<CreateSectionData>): Promise<Section> {
-    console.log('API: Update section', id, data);
+  async updateSection(id: string, data: Partial<CreateSectionData>): Promise<boolean> {
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    return {
-      id,
-      title: data.title || 'Updated Section',
-      description: data.description || 'Updated description',
-      content: data.content || '<p>Updated content</p>',
-      contractId: data.contractId || '1',
-      order: 1,
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: new Date().toISOString()
-    };
+    try{
+      const response = await fetch(`${BASE_URL}/sections/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar seção');
+      }
+      
+      const apiResponse = await response.json();
+
+      return apiResponse.data
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
-  async updateSectionOrder(contractId: string, sectionOrders: { id: string; order: number }[]): Promise<void> {
-    console.log('API: Update section order', contractId, sectionOrders);
+  async updateSectionOrder(templateId: string, sectionOrders: { id: string; sectionOrder: number }[]): Promise<void> {
+    console.log('API: Update section order', templateId, sectionOrders);
     await new Promise(resolve => setTimeout(resolve, 500));
     // Simulate API call to update section orders
   },
@@ -532,25 +606,25 @@ const api = {
     };
   },
 
-  async importSections(contractId: string, sectionIds: string[]): Promise<void> {
-    console.log('API: Import sections', contractId, sectionIds);
+  async importSections(templateId: string, sectionIds: string[]): Promise<void> {
+    console.log('API: Import sections', templateId, sectionIds);
     await new Promise(resolve => setTimeout(resolve, 1000));
   },
 
-  async processBatchContracts(contractIds: string[], file: File): Promise<void> {
-    console.log('API: Process batch contracts', contractIds, file.name);
+  async processBatchTemplates(templateIds: string[], file: File): Promise<void> {
+    console.log('API: Process batch templates', templateIds, file.name);
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Simulate file processing and ZIP download
     const link = document.createElement('a');
     link.href = 'data:application/zip;base64,UEsDBAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAbXlmaWxlLnR4dFBLAQIUAAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAABteWZpbGUudHh0UEsFBgAAAAABAAEANwAAAB8AAAAAAA==';
-    link.download = `contratos_lote_${Date.now()}.zip`;
+    link.download = `templates_lote_${Date.now()}.zip`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   },
 
-  async getGeneratedFiles(userId: string, page: number = 1, limit: number = 10): Promise<GeneratedFilesResponse> {
+  async getGeneratedFiles(page: number = 1, limit: number = 10): Promise<GeneratedFilesResponse> {
     await new Promise(resolve => setTimeout(resolve, 500));
     
     try{

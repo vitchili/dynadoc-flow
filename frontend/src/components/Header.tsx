@@ -59,7 +59,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Meus Documentos
+              Meus Templates
             </Link>
             <Link
               to="/batch"
@@ -161,7 +161,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Meus Documentos
+                Meus Templates
               </Link>
               <Link
                 to="/batch"

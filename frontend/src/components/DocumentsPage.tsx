@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Plus, FileText, Calendar, ChevronDown, ChevronUp, Edit, Trash2, Upload, Loader2, Search, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Contract, Section, Tag, CreateContractData, CreateSectionData, ContractsResponse } from '@/types';
+import { Template, Section, Tag, CreateTemplateData, CreateSectionData, TemplatesResponse } from '@/types';
 import api from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,66 +22,66 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [contractsData, setContractsData] = useState<ContractsResponse>({
-    contracts: [],
+  const [templatesData, setTemplatesData] = useState<TemplatesResponse>({
+    templates: [],
     total: 0,
     page: 1,
     totalPages: 0
   });
   const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [sectionsLoading, setSectionsLoading] = useState(false);
-  const [expandedContracts, setExpandedContracts] = useState<Set<string>>(new Set());
+  const [expandedTemplates, setExpandedTemplates] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Modal states
-  const [showNewContractModal, setShowNewContractModal] = useState(false);
-  const [showEditContractModal, setShowEditContractModal] = useState(false);
+  const [showNewTemplateModal, setShowNewTemplateModal] = useState(false);
+  const [showEditTemplateModal, setShowEditTemplateModal] = useState(false);
   const [showNewSectionModal, setShowNewSectionModal] = useState(false);
   const [showEditSectionModal, setShowEditSectionModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
-  const [editingContract, setEditingContract] = useState<Contract | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
 
   // Form states
-  const [newContractData, setNewContractData] = useState<CreateContractData>({
+  const [newTemplateData, setNewTemplateData] = useState<CreateTemplateData>({
     name: '',
     description: ''
   });
   const [newSectionData, setNewSectionData] = useState<CreateSectionData>({
-    title: '',
+    name: '',
     description: '',
-    content: '',
-    contractId: ''
+    htmlContent: '',
+    templateId: ''
   });
 
   useEffect(() => {
-    loadContracts();
+    loadTemplates();
     loadTags();
   }, [user, currentPage, searchQuery]);
 
-  const loadContracts = async () => {
+  const loadTemplates = async () => {
     if (!user) return;
     
     try {
       setLoading(true);
-      let response: ContractsResponse;
+      let response: TemplatesResponse;
       
       if (searchQuery.trim()) {
-        response = await api.filterContracts(user.id, searchQuery, currentPage, 10);
+        response = await api.filterTemplates(searchQuery, currentPage, 10);
       } else {
-        response = await api.getContracts(user.id, currentPage, 10);
+        response = await api.getTemplates(currentPage, 10);
       }
       
-      setContractsData(response);
+      setTemplatesData(response);
     } catch (error) {
       toast({
-        title: "Erro ao carregar contratos",
-        description: "Não foi possível carregar seus contratos.",
+        title: "Erro ao carregar templates",
+        description: "Não foi possível carregar seus templates.",
         variant: "destructive",
       });
     } finally {
@@ -93,22 +93,22 @@ const DocumentsPage: React.FC = () => {
     if (!user) return;
     
     try {
-      const tagsData = await api.getTags(user.id);
+      const tagsData = await api.getTags();
       setTags(tagsData);
     } catch (error) {
       console.error('Error loading tags:', error);
     }
   };
 
-  const loadSections = async (contractId: string) => {
+  const loadSections = async (templateId: string) => {
     try {
       setSectionsLoading(true);
-      const sectionsData = await api.getSections(contractId);
+      const sectionsData = await api.getSections(templateId);
       setSections(sectionsData);
     } catch (error) {
       toast({
         title: "Erro ao carregar seções",
-        description: "Não foi possível carregar as seções do contrato.",
+        description: "Não foi possível carregar as seções do template.",
         variant: "destructive",
       });
     } finally {
@@ -117,7 +117,7 @@ const DocumentsPage: React.FC = () => {
   };
 
   const moveSection = useCallback(async (dragIndex: number, hoverIndex: number) => {
-    if (!selectedContract) return;
+    if (!selectedTemplate) return;
 
     const dragSection = sections[dragIndex];
     const hoverSection = sections[hoverIndex];
@@ -130,14 +130,14 @@ const DocumentsPage: React.FC = () => {
     // Update order property based on new positions
     const updatedSections = newSections.map((section, index) => ({
       ...section,
-      order: index + 1
+      sectionOrder: index + 1
     }));
     
     setSections(updatedSections);
 
     try {
       // Update order in backend
-      await api.updateSectionOrder(selectedContract.id, updatedSections.map(s => ({ id: s.id, order: s.order })));
+      await api.updateSectionOrder(selectedTemplate.id, updatedSections.map(s => ({ id: s.id, sectionOrder: s.sectionOrder })));
       toast({
         title: "Ordem atualizada!",
         description: "A ordem das seções foi atualizada com sucesso.",
@@ -151,21 +151,21 @@ const DocumentsPage: React.FC = () => {
         variant: "destructive",
       });
     }
-  }, [sections, selectedContract, toast]);
+  }, [sections, selectedTemplate, toast]);
 
-  const handleContractClick = async (contract: Contract) => {
-    setSelectedContract(contract);
+  const handleTemplateClick = async (template: Template) => {
+    setSelectedTemplate(template);
     
-    if (expandedContracts.has(contract.id)) {
-      setExpandedContracts(prev => {
+    if (expandedTemplates.has(template.id)) {
+      setExpandedTemplates(prev => {
         const newSet = new Set(prev);
-        newSet.delete(contract.id);
+        newSet.delete(template.id);
         return newSet;
       });
       setSections([]);
     } else {
-      setExpandedContracts(prev => new Set([...prev, contract.id]));
-      await loadSections(contract.id);
+      setExpandedTemplates(prev => new Set([...prev, template.id]));
+      await loadSections(template.id);
     }
   };
 
@@ -180,69 +180,70 @@ const DocumentsPage: React.FC = () => {
     }
   };
 
-  const handleCreateContract = async () => {
-    if (!user || !newContractData.name.trim()) return;
+  const handleCreateTemplate = async () => {
+    if (!user || !newTemplateData.name.trim()) return;
 
     try {
-      const contract = await api.createContract(newContractData);
-      await loadContracts();
-      setNewContractData({ name: '', description: '' });
-      setShowNewContractModal(false);
+      const template = await api.createTemplate(newTemplateData);
+      await loadTemplates();
+      setNewTemplateData({ name: '', description: '' });
+      setShowNewTemplateModal(false);
       toast({
-        title: "Contrato criado!",
-        description: "Seu novo contrato foi criado com sucesso.",
+        title: "Template criado!",
+        description: "Seu novo template foi criado com sucesso.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao criar contrato",
-        description: "Não foi possível criar o contrato.",
+        title: "Erro ao criar template",
+        description: "Não foi possível criar o template.",
         variant: "destructive",
       });
     }
   };
 
-  const handleEditContract = (contract: Contract) => {
-    setEditingContract(contract);
-    setNewContractData({
-      name: contract.name,
-      description: contract.description
+  const handleEditTemplate = (template: Template) => {
+    setEditingTemplate(template);
+    setNewTemplateData({
+      name: template.name,
+      description: template.description
     });
-    setShowEditContractModal(true);
+    setShowEditTemplateModal(true);
   };
 
-  const handleUpdateContract = async () => {
-    if (!editingContract) return;
+  const handleUpdateTemplate = async () => {
+    if (!editingTemplate) return;
 
     try {
-      const updatedContract = await api.updateContract(editingContract.id, newContractData);
-      await loadContracts();
-      setEditingContract(null);
-      setNewContractData({ name: '', description: '' });
-      setShowEditContractModal(false);
+      const updatedTemplate = await api.updateTemplate(editingTemplate.id, newTemplateData);
+      await loadTemplates();
+      setEditingTemplate(null);
+      setNewTemplateData({ name: '', description: '' });
+      setShowEditTemplateModal(false);
       toast({
-        title: "Contrato atualizado!",
-        description: "O contrato foi atualizado com sucesso.",
+        title: "Template atualizado!",
+        description: "O template foi atualizado com sucesso.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao atualizar contrato",
-        description: "Não foi possível atualizar o contrato.",
+        title: "Erro ao atualizar template",
+        description: "Não foi possível atualizar o template.",
         variant: "destructive",
       });
     }
   };
 
   const handleCreateSection = async () => {
-    if (!selectedContract || !newSectionData.title.trim()) return;
+    if (!selectedTemplate || !newSectionData.name.trim()) return;
 
     try {
       const sectionData = {
         ...newSectionData,
-        contractId: selectedContract.id
+        templateId: selectedTemplate.id
       };
-      const section = await api.createSection(sectionData);
-      setSections(prev => [...prev, section]);
-      setNewSectionData({ title: '', description: '', content: '', contractId: '' });
+      await api.createSection(sectionData);
+      const updatedSections = await api.getSections(sectionData.templateId);
+      setSections(updatedSections);
+      setNewSectionData({ name: '', description: '', htmlContent: '', templateId: '' });
       setShowNewSectionModal(false);
       toast({
         title: "Seção criada!",
@@ -260,10 +261,10 @@ const DocumentsPage: React.FC = () => {
   const handleEditSection = (section: Section) => {
     setEditingSection(section);
     setNewSectionData({
-      title: section.title,
+      name: section.name,
       description: section.description,
-      content: section.content,
-      contractId: section.contractId
+      htmlContent: section.htmlContent,
+      templateId: section.templateId
     });
     setShowEditSectionModal(true);
   };
@@ -272,10 +273,11 @@ const DocumentsPage: React.FC = () => {
     if (!editingSection) return;
 
     try {
-      const updatedSection = await api.updateSection(editingSection.id, newSectionData);
-      setSections(prev => prev.map(s => s.id === editingSection.id ? updatedSection : s));
+      await api.updateSection(editingSection.id, newSectionData);
+      const updatedSections = await api.getSections(newSectionData.templateId);
+      setSections(updatedSections);
       setEditingSection(null);
-      setNewSectionData({ title: '', description: '', content: '', contractId: '' });
+      setNewSectionData({ name: '', description: '', htmlContent: '', templateId: '' });
       setShowEditSectionModal(false);
       toast({
         title: "Seção atualizada!",
@@ -313,26 +315,26 @@ const DocumentsPage: React.FC = () => {
     setCurrentPage(page);
   };
 
-  const handleDeleteContract = async (contractId: string, contractName: string) => {
+  const handleDeleteTemplate = async (templateId: string, templateName: string) => {
     try {
-      await api.deleteContract(contractId);
-      await loadContracts();
+      await api.deleteTemplate(templateId);
+      await loadTemplates();
       toast({
-        title: "Contrato excluído!",
-        description: "O contrato e suas seções foram excluídos com sucesso.",
+        title: "Template excluído!",
+        description: "O template e suas seções foram excluídos com sucesso.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao excluir contrato",
-        description: "Não foi possível excluir o contrato.",
+        title: "Erro ao excluir template",
+        description: "Não foi possível excluir o template.",
         variant: "destructive",
       });
     }
   };
 
-  const handleDownloadExample = async (contractId: string) => {
+  const handleDownloadExample = async (templateId: string) => {
     try {
-      await api.downloadContractExample(contractId);
+      await api.downloadTemplateExample(templateId);
       toast({
         title: "Download iniciado!",
         description: "O download do modelo será processado.",
@@ -340,7 +342,7 @@ const DocumentsPage: React.FC = () => {
     } catch (error) {
       toast({
         title: "Erro no download",
-        description: "Não foi possível baixar o modelo do contrato.",
+        description: "Não foi possível baixar o modelo do template.",
         variant: "destructive",
       });
     }
@@ -366,32 +368,32 @@ const DocumentsPage: React.FC = () => {
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold gradient-text">Meus Documentos</h1>
-            <p className="text-gray-300 mt-2">Gerencie seus contratos e seções</p>
+            <h1 className="text-3xl font-bold gradient-text">Meus Templates</h1>
+            <p className="text-gray-300 mt-2">Gerencie seus templates e seções</p>
           </div>
           
-          <Dialog open={showNewContractModal} onOpenChange={setShowNewContractModal}>
+          <Dialog open={showNewTemplateModal} onOpenChange={setShowNewTemplateModal}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800">
                 <Plus className="w-4 h-4 mr-2" />
-                Novo Contrato
+                Novo Template
               </Button>
             </DialogTrigger>
             <DialogContent className="glass-strong border-white/20">
               <DialogHeader>
-                <DialogTitle>Criar Novo Contrato</DialogTitle>
+                <DialogTitle>Criar Novo Template</DialogTitle>
                 <DialogDescription>
-                  Preencha as informações do novo contrato
+                  Preencha as informações do novo template
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="contract-name">Nome do Contrato</Label>
+                  <Label htmlFor="template-name">Nome do Template</Label>
                   <Input
-                    id="contract-name"
-                    placeholder="Ex: Contrato de Prestação de Serviços"
-                    value={newContractData.name}
-                    onChange={(e) => setNewContractData(prev => ({
+                    id="template-name"
+                    placeholder="Ex: Template de Prestação de Serviços"
+                    value={newTemplateData.name}
+                    onChange={(e) => setNewTemplateData(prev => ({
                       ...prev,
                       name: e.target.value
                     }))}
@@ -399,12 +401,12 @@ const DocumentsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="contract-description">Descrição</Label>
+                  <Label htmlFor="template-description">Descrição</Label>
                   <Textarea
-                    id="contract-description"
-                    placeholder="Descreva o propósito deste contrato..."
-                    value={newContractData.description}
-                    onChange={(e) => setNewContractData(prev => ({
+                    id="template-description"
+                    placeholder="Descreva o propósito deste template..."
+                    value={newTemplateData.description}
+                    onChange={(e) => setNewTemplateData(prev => ({
                       ...prev,
                       description: e.target.value
                     }))}
@@ -414,17 +416,17 @@ const DocumentsPage: React.FC = () => {
                 <div className="flex justify-end space-x-2">
                   <Button
                     variant="outline"
-                    onClick={() => setShowNewContractModal(false)}
+                    onClick={() => setShowNewTemplateModal(false)}
                     className="border-white/20"
                   >
                     Cancelar
                   </Button>
                   <Button
-                    onClick={handleCreateContract}
-                    disabled={!newContractData.name.trim()}
+                    onClick={handleCreateTemplate}
+                    disabled={!newTemplateData.name.trim()}
                     className="bg-gradient-to-r from-gray-500 to-gray-700"
                   >
-                    Criar Contrato
+                    Criar Template
                   </Button>
                 </div>
               </div>
@@ -438,7 +440,7 @@ const DocumentsPage: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
               type="text"
-              placeholder="Pesquisar contratos..."
+              placeholder="Pesquisar templates..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyPress={handleSearchKeyPress}
@@ -454,24 +456,24 @@ const DocumentsPage: React.FC = () => {
           </Button>
         </div>
 
-        {contractsData.contracts.length === 0 ? (
+        {templatesData.templates.length === 0 ? (
           <Card className="glass-card border-white/20 text-center py-12">
             <CardHeader>
               <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <CardTitle>Nenhum contrato encontrado</CardTitle>
+              <CardTitle>Nenhum template encontrado</CardTitle>
               <CardDescription>
-                {searchQuery ? 'Nenhum contrato corresponde à sua pesquisa' : 'Crie seu primeiro contrato para começar a organizar seus documentos'}
+                {searchQuery ? 'Nenhum template corresponde à sua pesquisa' : 'Crie seu primeiro template para começar a organizar seus documentos'}
               </CardDescription>
             </CardHeader>
           </Card>
         ) : (
           <>
             <div className="space-y-4">
-              {contractsData.contracts.map((contract) => (
-                <Card key={contract.id} className="glass-card border-white/20">
+              {templatesData.templates.map((template) => (
+                <Card key={template.id} className="glass-card border-white/20">
                   <Collapsible
-                    open={expandedContracts.has(contract.id)}
-                    onOpenChange={() => handleContractClick(contract)}
+                    open={expandedTemplates.has(template.id)}
+                    onOpenChange={() => handleTemplateClick(template)}
                   >
                     <CollapsibleTrigger asChild>
                       <CardHeader className="cursor-pointer hover:bg-white/5 transition-colors">
@@ -479,9 +481,9 @@ const DocumentsPage: React.FC = () => {
                           <div className="flex items-center space-x-3">
                             <FileText className="w-6 h-6 text-gray-400" />
                             <div>
-                              <CardTitle className="text-left">{contract.name}</CardTitle>
+                              <CardTitle className="text-left">{template.name}</CardTitle>
                               <CardDescription className="text-left mt-1">
-                                {contract.description}
+                                {template.description}
                               </CardDescription>
                             </div>
                           </div>
@@ -492,7 +494,7 @@ const DocumentsPage: React.FC = () => {
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDownloadExample(contract.id);
+                                  handleDownloadExample(template.id);
                                 }}
                                 className="text-gray-400 hover:text-gray-300"
                               >
@@ -503,7 +505,7 @@ const DocumentsPage: React.FC = () => {
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleEditContract(contract);
+                                  handleEditTemplate(template);
                                 }}
                                 className="text-gray-400 hover:text-gray-300"
                               >
@@ -524,7 +526,7 @@ const DocumentsPage: React.FC = () => {
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Tem certeza que deseja excluir o contrato "{contract.name}" e todas as suas seções? Esta ação não pode ser desfeita.
+                                      Tem certeza que deseja excluir o template "{template.name}" e todas as suas seções? Esta ação não pode ser desfeita.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
@@ -532,7 +534,7 @@ const DocumentsPage: React.FC = () => {
                                       Cancelar
                                     </AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => handleDeleteContract(contract.id, contract.name)}
+                                      onClick={() => handleDeleteTemplate(template.id, template.name)}
                                       className="bg-red-600 hover:bg-red-700"
                                     >
                                       Excluir
@@ -541,11 +543,7 @@ const DocumentsPage: React.FC = () => {
                                 </AlertDialogContent>
                               </AlertDialog>
                             </div>
-                            <div className="text-sm text-gray-400 flex items-center">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              {formatDate(contract.updatedAt)}
-                            </div>
-                            {expandedContracts.has(contract.id) ? (
+                            {expandedTemplates.has(template.id) ? (
                               <ChevronUp className="w-5 h-5" />
                             ) : (
                               <ChevronDown className="w-5 h-5" />
@@ -559,13 +557,13 @@ const DocumentsPage: React.FC = () => {
                       <CardContent className="pt-0">
                         <div className="border-t border-white/20 pt-4">
                           <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold">Seções do Contrato</h3>
+                            <h3 className="text-lg font-semibold">Seções do Template</h3>
                             <div className="flex space-x-2">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  setSelectedContract(contract);
+                                  setSelectedTemplate(template);
                                   setShowImportModal(true);
                                 }}
                                 className="border-white/20"
@@ -576,8 +574,8 @@ const DocumentsPage: React.FC = () => {
                               <Button
                                 size="sm"
                                 onClick={() => {
-                                  setSelectedContract(contract);
-                                  setNewSectionData({ title: '', description: '', content: '', contractId: contract.id });
+                                  setSelectedTemplate(template);
+                                  setNewSectionData({ name: '', description: '', htmlContent: '', templateId: template.id });
                                   setShowNewSectionModal(true);
                                 }}
                                 className="bg-gradient-to-r from-gray-500 to-gray-700"
@@ -588,17 +586,17 @@ const DocumentsPage: React.FC = () => {
                             </div>
                           </div>
 
-                          {sectionsLoading && selectedContract?.id === contract.id ? (
+                          {sectionsLoading && selectedTemplate?.id === template.id ? (
                             <div className="text-center py-8">
                               <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                               <p className="text-gray-400">Carregando seções...</p>
                             </div>
-                          ) : sections.length === 0 && selectedContract?.id === contract.id ? (
+                          ) : sections.length === 0 && selectedTemplate?.id === template.id ? (
                             <div className="text-center py-8 text-gray-400">
                               <p>Nenhuma seção criada ainda</p>
                             </div>
                           ) : (
-                            selectedContract?.id === contract.id && (
+                            selectedTemplate?.id === template.id && (
                               <div className="space-y-3">
                                 {sections
                                   .sort((a, b) => a.order - b.order)
@@ -624,7 +622,7 @@ const DocumentsPage: React.FC = () => {
             </div>
 
             {/* Pagination */}
-            {contractsData.totalPages > 1 && (
+            {templatesData.totalPages > 1 && (
               <Pagination className="mt-8">
                 <PaginationContent>
                   <PaginationItem>
@@ -634,7 +632,7 @@ const DocumentsPage: React.FC = () => {
                     />
                   </PaginationItem>
                   
-                  {Array.from({ length: contractsData.totalPages }, (_, i) => i + 1).map((page) => (
+                  {Array.from({ length: templatesData.totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
                         onClick={() => handlePageChange(page)}
@@ -648,8 +646,8 @@ const DocumentsPage: React.FC = () => {
                   
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => handlePageChange(Math.min(contractsData.totalPages, currentPage + 1))}
-                      className={currentPage === contractsData.totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      onClick={() => handlePageChange(Math.min(templatesData.totalPages, currentPage + 1))}
+                      className={currentPage === templatesData.totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -664,7 +662,7 @@ const DocumentsPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Criar Nova Seção</DialogTitle>
               <DialogDescription>
-                Adicione uma nova seção ao contrato "{selectedContract?.name}"
+                Adicione uma nova seção ao template "{selectedTemplate?.name}"
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -673,10 +671,10 @@ const DocumentsPage: React.FC = () => {
                 <Input
                   id="section-title"
                   placeholder="Ex: Cláusulas Gerais"
-                  value={newSectionData.title}
+                  value={newSectionData.name}
                   onChange={(e) => setNewSectionData(prev => ({
                     ...prev,
-                    title: e.target.value
+                    name: e.target.value
                   }))}
                   className="glass bg-white/5 border-white/20"
                 />
@@ -697,10 +695,10 @@ const DocumentsPage: React.FC = () => {
               <div>
                 <Label>Conteúdo da Seção</Label>
                 <Editor
-                  content={newSectionData.content}
-                  onChange={(content) => setNewSectionData(prev => ({
+                  htmlContent={newSectionData.htmlContent}
+                  onChange={(htmlContent) => setNewSectionData(prev => ({
                     ...prev,
-                    content
+                    htmlContent
                   }))}
                   tags={tags}
                   placeholder="Digite o conteúdo da seção..."
@@ -716,7 +714,7 @@ const DocumentsPage: React.FC = () => {
                 </Button>
                 <Button
                   onClick={handleCreateSection}
-                  disabled={!newSectionData.title.trim()}
+                  disabled={!newSectionData.name.trim()}
                   className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
                 >
                   Criar Seção
@@ -726,23 +724,23 @@ const DocumentsPage: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Modal Editar Contrato */}
-        <Dialog open={showEditContractModal} onOpenChange={setShowEditContractModal}>
+        {/* Modal Editar Template */}
+        <Dialog open={showEditTemplateModal} onOpenChange={setShowEditTemplateModal}>
           <DialogContent className="glass-strong border-white/20">
             <DialogHeader>
-              <DialogTitle>Editar Contrato</DialogTitle>
+              <DialogTitle>Editar Template</DialogTitle>
               <DialogDescription>
-                Edite as informações do contrato "{editingContract?.name}"
+                Edite as informações do template "{editingTemplate?.name}"
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="edit-contract-name">Nome do Contrato</Label>
+                <Label htmlFor="edit-template-name">Nome do Template</Label>
                 <Input
-                  id="edit-contract-name"
-                  placeholder="Ex: Contrato de Prestação de Serviços"
-                  value={newContractData.name}
-                  onChange={(e) => setNewContractData(prev => ({
+                  id="edit-template-name"
+                  placeholder="Ex: Template de Prestação de Serviços"
+                  value={newTemplateData.name}
+                  onChange={(e) => setNewTemplateData(prev => ({
                     ...prev,
                     name: e.target.value
                   }))}
@@ -750,12 +748,12 @@ const DocumentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-contract-description">Descrição</Label>
+                <Label htmlFor="edit-template-description">Descrição</Label>
                 <Textarea
-                  id="edit-contract-description"
-                  placeholder="Descreva o propósito deste contrato..."
-                  value={newContractData.description}
-                  onChange={(e) => setNewContractData(prev => ({
+                  id="edit-template-description"
+                  placeholder="Descreva o propósito deste template..."
+                  value={newTemplateData.description}
+                  onChange={(e) => setNewTemplateData(prev => ({
                     ...prev,
                     description: e.target.value
                   }))}
@@ -765,14 +763,14 @@ const DocumentsPage: React.FC = () => {
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() => setShowEditContractModal(false)}
+                  onClick={() => setShowEditTemplateModal(false)}
                   className="border-white/20"
                 >
                   Cancelar
                 </Button>
                 <Button
-                  onClick={handleUpdateContract}
-                  disabled={!newContractData.name.trim()}
+                  onClick={handleUpdateTemplate}
+                  disabled={!newTemplateData.name.trim()}
                   className="bg-gradient-to-r from-gray-500 to-gray-700"
                 >
                   Salvar
@@ -788,7 +786,7 @@ const DocumentsPage: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Editar Seção</DialogTitle>
               <DialogDescription>
-                Edite a seção "{editingSection?.title}"
+                Edite a seção "{editingSection?.name}"
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -796,7 +794,7 @@ const DocumentsPage: React.FC = () => {
                 <Label htmlFor="edit-section-title">Título da Seção</Label>
                 <Input
                   id="edit-section-title"
-                  value={newSectionData.title}
+                  value={newSectionData.name}
                   onChange={(e) => setNewSectionData(prev => ({
                     ...prev,
                     title: e.target.value
@@ -819,10 +817,10 @@ const DocumentsPage: React.FC = () => {
               <div>
                 <Label>Conteúdo da Seção</Label>
                 <Editor
-                  content={newSectionData.content}
-                  onChange={(content) => setNewSectionData(prev => ({
+                  htmlContent={newSectionData.htmlContent}
+                  onChange={(htmlContent) => setNewSectionData(prev => ({
                     ...prev,
-                    content
+                    htmlContent
                   }))}
                   tags={tags}
                 />
@@ -837,7 +835,7 @@ const DocumentsPage: React.FC = () => {
                 </Button>
                 <Button
                   onClick={handleUpdateSection}
-                  disabled={!newSectionData.title.trim()}
+                  disabled={!newSectionData.name.trim()}
                   className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
                 >
                   Salvar Alterações
@@ -848,14 +846,14 @@ const DocumentsPage: React.FC = () => {
         </Dialog>
 
         {/* Modal Importar Seção */}
-        {showImportModal && selectedContract && (
+        {showImportModal && selectedTemplate && (
           <ImportSectionModal
             isOpen={showImportModal}
             onClose={() => setShowImportModal(false)}
-            targetContract={selectedContract}
+            targetTemplate={selectedTemplate}
             onImportComplete={() => {
-              if (selectedContract) {
-                loadSections(selectedContract.id);
+              if (selectedTemplate) {
+                loadSections(selectedTemplate.id);
               }
             }}
           />

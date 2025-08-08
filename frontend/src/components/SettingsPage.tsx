@@ -342,7 +342,7 @@ const SettingsPage: React.FC = () => {
                 <DialogHeader>
                   <DialogTitle>Criar Nova Tag</DialogTitle>
                   <DialogDescription>
-                    Crie uma nova tag dinâmica para usar em seus contratos
+                    Crie uma nova tag dinâmica para usar em seus templates
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -453,7 +453,7 @@ const SettingsPage: React.FC = () => {
                 <TagIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                 <CardTitle>Nenhuma tag criada</CardTitle>
                 <CardDescription>
-                  Crie sua primeira tag dinâmica para personalizar seus contratos
+                  Crie sua primeira tag dinâmica para personalizar seus templates
                 </CardDescription>
               </CardHeader>
             </Card>
