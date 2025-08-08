@@ -355,8 +355,24 @@ const api = {
   },
 
   async deleteSection(id: string): Promise<void> {
-    console.log('API: Delete section', id);
     await new Promise(resolve => setTimeout(resolve, 500));
+
+    try{
+      const response = await fetch(`${BASE_URL}/sections/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this.getAuthToken()
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao excluir seção');
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
   },
 
   // Contexts CRUD API
