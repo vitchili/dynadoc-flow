@@ -483,7 +483,7 @@ const DocumentsPage: React.FC = () => {
                             <div>
                               <CardTitle className="text-left">{template.name}</CardTitle>
                               <CardDescription className="text-left mt-1">
-                                {template.description}
+                                ID: {template.id}
                               </CardDescription>
                             </div>
                           </div>
@@ -797,7 +797,7 @@ const DocumentsPage: React.FC = () => {
                   value={newSectionData.name}
                   onChange={(e) => setNewSectionData(prev => ({
                     ...prev,
-                    title: e.target.value
+                    name: e.target.value
                   }))}
                   className="glass bg-white/5 border-white/20"
                 />

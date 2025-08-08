@@ -55,27 +55,27 @@ const Header: React.FC = () => {
               to="/documents"
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActiveRoute('/documents')
-                  ? 'bg-purple-500/20 text-purple-300'
+                  ? 'text-purple-300'
                   : 'hover:bg-white/10'
               }`}
             >
               Meus Templates
             </Link>
-            <Link
+            {/* <Link
               to="/batch"
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActiveRoute('/batch')
-                  ? 'bg-purple-500/20 text-purple-300'
+                  ? 'text-purple-300'
                   : 'hover:bg-white/10'
               }`}
             >
               Lote
-            </Link>
+            </Link> */}
             <Link
               to="/files"
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActiveRoute('/files')
-                  ? 'bg-purple-500/20 text-purple-300'
+                  ? 'text-purple-300'
                   : 'hover:bg-white/10'
               }`}
             >
@@ -85,7 +85,7 @@ const Header: React.FC = () => {
               to="/api"
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActiveRoute('/api')
-                  ? 'bg-purple-500/20 text-purple-300'
+                  ? 'text-purple-300'
                   : 'hover:bg-white/10'
               }`}
             >
@@ -95,7 +95,7 @@ const Header: React.FC = () => {
               to="/settings"
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActiveRoute('/settings')
-                  ? 'bg-purple-500/20 text-purple-300'
+                  ? 'text-purple-300'
                   : 'hover:bg-white/10'
               }`}
             >
@@ -156,7 +156,7 @@ const Header: React.FC = () => {
                 to="/documents"
                 className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActiveRoute('/documents')
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'text-purple-300'
                     : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -167,7 +167,7 @@ const Header: React.FC = () => {
                 to="/batch"
                 className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActiveRoute('/batch')
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'text-purple-300'
                     : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -178,7 +178,7 @@ const Header: React.FC = () => {
                 to="/files"
                 className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActiveRoute('/files')
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'text-purple-300'
                     : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -189,7 +189,7 @@ const Header: React.FC = () => {
                 to="/api"
                 className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActiveRoute('/api')
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'text-purple-300'
                     : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -200,7 +200,7 @@ const Header: React.FC = () => {
                 to="/settings"
                 className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                   isActiveRoute('/settings')
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'text-purple-300'
                     : 'hover:bg-white/10'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}

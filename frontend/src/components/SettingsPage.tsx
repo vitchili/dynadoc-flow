@@ -270,7 +270,7 @@ const SettingsPage: React.FC = () => {
     switch (type) {
       case '1': return 'bg-blue-500/20 text-blue-300';
       case '2': return 'bg-green-500/20 text-green-300';
-      case '3': return 'bg-purple-500/20 text-purple-300';
+      case '3': return 'text-purple-300';
       default: return 'bg-gray-500/20 text-gray-300';
     }
   };

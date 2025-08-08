@@ -11,6 +11,6 @@ Route::middleware(JwtAuthMiddleware::class)->group(function () {
         Route::post('/async-generate', 'asyncGenerate');
         Route::delete('/{fileId}', 'destroy');
         // TODO - Async Batch Generate
-        // TODO - Download (sync) file. Route::get('/download/{fileId}', 'downloadFile');
+        Route::get('/download/{fileId}', 'download');
     });
 });
