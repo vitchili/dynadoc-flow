@@ -10,21 +10,11 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN pecl install protobuf \
-    && pecl install opentelemetry \
-    && docker-php-ext-enable protobuf opentelemetry
-
 WORKDIR /var/www/html
 
 COPY . .
 
 RUN chown -R www-data:www-data /var/www/html
-
-RUN composer install --no-dev --optimize-autoloader \
-    && composer require open-telemetry/opentelemetry-auto-laravel \
-       open-telemetry/sdk \
-       open-telemetry/exporter-otlp \
-       php-http/guzzle7-adapter
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
