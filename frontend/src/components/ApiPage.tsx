@@ -51,17 +51,17 @@ const ApiPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen from-purple-900 via-blue-900 to-indigo-900">
+      <div className="">
         {/* Header */}
-        <div className="text-center space-y-4 mb-8">
-          <div className="flex items-center justify-center space-x-2">
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center space-x-2">
             <Code className="w-8 h-8 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-3xl font-bold text-white">
               Documentação da API
             </h1>
           </div>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg mx-auto">
             Utilize esta documentação para integrar a geração de templates em suas aplicações.
             Envie os dados via JSON para gerar múltiplos templates dinamicamente.
           </p>

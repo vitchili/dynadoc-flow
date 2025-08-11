@@ -94,7 +94,7 @@ const FilesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-2">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 gradient-text">Arquivos Gerados</h1>
         <p className="text-gray-300">Visualize e baixe todos os arquivos que foram gerados</p>
