@@ -78,7 +78,7 @@ const SettingsPage: React.FC = () => {
     } catch (error) {
       toast({
         title: "Erro ao carregar dados",
-        description: "Não foi possível carregar as tags e contextos.",
+        description: "Não foi possível carregar as tags e contexts.",
         variant: "destructive",
       });
     } finally {
@@ -119,13 +119,13 @@ const SettingsPage: React.FC = () => {
       resetTagForm();
       setShowNewTagModal(false);
       toast({
-        title: "Tag criada!",
-        description: "A nova tag dinâmica foi criada com sucesso.",
+        title: "Tag created!",
+        description: "The new tag was created with success.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao criar tag",
-        description: "Não foi possível criar a tag.",
+        title: "Error",
+        description: "It wasn't possible to create the tag.",
         variant: "destructive",
       });
     } finally {
@@ -200,13 +200,13 @@ const SettingsPage: React.FC = () => {
       resetContextForm();
       setShowNewContextModal(false);
       toast({
-        title: "Contexto criado!",
-        description: "O novo contexto foi criado com sucesso.",
+        title: "Context created!",
+        description: "The new context was created with success.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao criar contexto",
-        description: "Não foi possível criar o contexto.",
+        title: "Error",
+        description: "It wasn't possible to create the context.",
         variant: "destructive",
       });
     } finally {
@@ -233,13 +233,13 @@ const SettingsPage: React.FC = () => {
       resetContextForm();
       setShowEditContextModal(false);
       toast({
-        title: "Contexto atualizado!",
-        description: "O contexto foi atualizado com sucesso.",
+        title: "Context atualizado!",
+        description: "O context foi atualizado com sucesso.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao atualizar contexto",
-        description: "Não foi possível atualizar o contexto.",
+        title: "Erro ao atualizar context",
+        description: "Não foi possível atualizar o context.",
         variant: "destructive",
       });
     } finally {
@@ -254,13 +254,13 @@ const SettingsPage: React.FC = () => {
       setContexts(prev => prev.filter(c => c.id !== contextId));
       setTags(prev => prev.filter(t => t.contextId !== contextId));
       toast({
-        title: "Contexto excluído!",
-        description: "O contexto e suas tags foram excluídos com sucesso.",
+        title: "Context excluído!",
+        description: "O context e suas tags foram excluídos com sucesso.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao excluir contexto",
-        description: "Não foi possível excluir o contexto.",
+        title: "Erro ao excluir context",
+        description: "Não foi possível excluir o context.",
         variant: "destructive",
       });
     }
@@ -277,8 +277,8 @@ const SettingsPage: React.FC = () => {
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case '1': return 'Texto';
-      case '2': return 'Número';
+      case '1': return 'Text';
+      case '2': return 'Number';
       case '3': return 'Data';
       default: return type;
     }
@@ -286,7 +286,7 @@ const SettingsPage: React.FC = () => {
 
   // Group tags by context
   const tagsByContext = tags.reduce((acc, tag) => {
-    const contextName = tag.context?.name || 'Sem Contexto';
+    const contextName = tag.context?.name || 'Sem Context';
     if (!acc[contextName]) {
       acc[contextName] = [];
     }
@@ -299,7 +299,7 @@ const SettingsPage: React.FC = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="glass-card p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300">Carregando configurações...</p>
+          <p className="text-gray-300">Loading configurações...</p>
         </div>
       </div>
     );
@@ -308,52 +308,52 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-3xl font-bold gradient-text">Configurações</h1>
-        <p className="text-gray-300 mt-2">Gerencie suas tags dinâmicas e contextos</p>
+        <h1 className="text-3xl font-bold gradient-text">Settings</h1>
+        <p className="text-gray-300 mt-2">Manage your dynamic tags and contexts</p>
       </div>
 
       <Tabs defaultValue="tags" className="w-full">
         <TabsList className="grid w-full grid-cols-2 glass-card border-white/20">
           <TabsTrigger value="tags" className="data-[state=active]:bg-white/20">
             <TagIcon className="w-4 h-4 mr-2" />
-            Gerenciar Tags
+            Manage Tags
           </TabsTrigger>
           <TabsTrigger value="contexts" className="data-[state=active]:bg-white/20">
             <FolderOpen className="w-4 h-4 mr-2" />
-            Gerenciar Contextos
+            Manage Contexts
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="tags" className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-gray-200">Tags Dinâmicas</h2>
-              <p className="text-gray-400">Gerencie suas tags organizadas por contexto</p>
+              <h2 className="text-xl font-semibold text-gray-200">Dynamic Tags</h2>
+              <p className="text-gray-400">Manage your tags organized by context</p>
             </div>
             
             <Dialog open={showNewTagModal} onOpenChange={setShowNewTagModal}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
                   <Plus className="w-4 h-4 mr-2" />
-                  Nova Tag
+                  New Tag
                 </Button>
               </DialogTrigger>
               <DialogContent className="glass-strong border-white/20">
                 <DialogHeader>
-                  <DialogTitle>Criar Nova Tag</DialogTitle>
+                  <DialogTitle>Create New Tag</DialogTitle>
                   <DialogDescription>
                     Crie uma nova tag dinâmica para usar em seus templates
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="tag-context">Contexto</Label>
+                    <Label htmlFor="tag-context">Context</Label>
                     <Select
                       value={newTagData.contextId}
                       onValueChange={(value) => setNewTagData(prev => ({ ...prev, contextId: value }))}
                     >
                       <SelectTrigger className="glass bg-white/5 border-white/20">
-                        <SelectValue placeholder="Selecione um contexto" />
+                        <SelectValue placeholder="Select a context" />
                       </SelectTrigger>
                       <SelectContent className="glass-strong border-white/20">
                         {contexts.map((context) => (
@@ -366,10 +366,10 @@ const SettingsPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="tag-name">Nome da Tag</Label>
+                    <Label htmlFor="tag-name">Tag Name</Label>
                     <Input
                       id="tag-name"
-                      placeholder="Ex: Nome Completo"
+                      placeholder="Ex: Full name"
                       value={newTagData.name}
                       onChange={(e) => setNewTagData(prev => ({
                         ...prev,
@@ -378,12 +378,12 @@ const SettingsPage: React.FC = () => {
                       className="glass bg-white/5 border-white/20"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      O nome será convertido para maiúsculas e espaços serão substituídos por underscore
+                      The name will be converted to uppercase and spaces will be replaced by underscores
                     </p>
                   </div>
 
                   <div>
-                    <Label htmlFor="tag-type">Tipo de Campo</Label>
+                    <Label htmlFor="tag-type">Field Type</Label>
                     <Select
                       value={newTagData.type}
                       onValueChange={(value: '1' | '2' | '3') => 
@@ -394,18 +394,18 @@ const SettingsPage: React.FC = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="glass-strong border-white/20">
-                        <SelectItem value="1">Texto</SelectItem>
-                        <SelectItem value="2">Número</SelectItem>
+                        <SelectItem value="1">Text</SelectItem>
+                        <SelectItem value="2">Number</SelectItem>
                         <SelectItem value="3">Data</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div>
-                    <Label htmlFor="tag-description">Descrição</Label>
+                    <Label htmlFor="tag-description">Description</Label>
                     <Textarea
                       id="tag-description"
-                      placeholder="Descreva o propósito desta tag..."
+                      placeholder="Describe the purpose of this tag..."
                       value={newTagData.description}
                       onChange={(e) => setNewTagData(prev => ({
                         ...prev,
@@ -425,7 +425,7 @@ const SettingsPage: React.FC = () => {
                       className="border-white/20"
                       disabled={saving}
                     >
-                      Cancelar
+                      Cancel
                     </Button>
                     <Button
                       onClick={handleCreateTag}
@@ -438,7 +438,7 @@ const SettingsPage: React.FC = () => {
                           Criando...
                         </>
                       ) : (
-                        'Criar Tag'
+                        'Create Tag'
                       )}
                     </Button>
                   </div>
@@ -451,9 +451,9 @@ const SettingsPage: React.FC = () => {
             <Card className="glass-card border-white/20 text-center py-12">
               <CardHeader>
                 <TagIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <CardTitle>Nenhuma tag criada</CardTitle>
+                <CardTitle>No tag created</CardTitle>
                 <CardDescription>
-                  Crie sua primeira tag dinâmica para personalizar seus templates
+                  Create your first dynamic tag to personalize your templates.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -493,14 +493,14 @@ const SettingsPage: React.FC = () => {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="glass-strong border-white/20">
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                    <AlertDialogTitle>Confirm exclusion</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Tem certeza que deseja excluir a tag "{tag.name}"? Esta ação não pode ser desfeita.
+                                      Are you sure you want to exclude a tag "{tag.name}"? This can't be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel className="border-white/20">
-                                      Cancelar
+                                      Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() => handleDeleteTag(tag.id)}
@@ -543,24 +543,24 @@ const SettingsPage: React.FC = () => {
             </div>
           )}
 
-          {/* Modal Editar Tag */}
+          {/* Modal Edit Tag */}
           <Dialog open={showEditTagModal} onOpenChange={setShowEditTagModal}>
             <DialogContent className="glass-strong border-white/20">
               <DialogHeader>
-                <DialogTitle>Editar Tag</DialogTitle>
+                <DialogTitle>Edit Tag</DialogTitle>
                 <DialogDescription>
                   Edite as informações da tag "{editingTag?.name}"
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="edit-tag-context">Contexto</Label>
+                  <Label htmlFor="edit-tag-context">Context</Label>
                   <Select
                     value={newTagData.contextId}
                     onValueChange={(value) => setNewTagData(prev => ({ ...prev, contextId: value }))}
                   >
                     <SelectTrigger className="glass bg-white/5 border-white/20">
-                      <SelectValue placeholder="Selecione um contexto" />
+                      <SelectValue placeholder="Select a context" />
                     </SelectTrigger>
                     <SelectContent className="glass-strong border-white/20">
                       {contexts.map((context) => (
@@ -573,7 +573,7 @@ const SettingsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-tag-name">Nome da Tag</Label>
+                  <Label htmlFor="edit-tag-name">Tag Name</Label>
                   <Input
                     id="edit-tag-name"
                     value={newTagData.name}
@@ -586,7 +586,7 @@ const SettingsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-tag-type">Tipo de Campo</Label>
+                  <Label htmlFor="edit-tag-type">Field Type</Label>
                   <Select
                     value='1'
                     onValueChange={(value: "1" | "2" | "3") => 
@@ -597,15 +597,15 @@ const SettingsPage: React.FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="glass-strong border-white/20">
-                      <SelectItem value="1">Texto</SelectItem>
-                      <SelectItem value="2">Número</SelectItem>
+                      <SelectItem value="1">Text</SelectItem>
+                      <SelectItem value="2">Number</SelectItem>
                       <SelectItem value="3">Data</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-tag-description">Descrição</Label>
+                  <Label htmlFor="edit-tag-description">Description</Label>
                   <Textarea
                     id="edit-tag-description"
                     value={newTagData.description}
@@ -627,7 +627,7 @@ const SettingsPage: React.FC = () => {
                     className="border-white/20"
                     disabled={saving}
                   >
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button
                     onClick={handleUpdateTag}
@@ -652,27 +652,27 @@ const SettingsPage: React.FC = () => {
         <TabsContent value="contexts" className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-gray-200">Contextos</h2>
-              <p className="text-gray-400">Organize suas tags em contextos para facilitar o gerenciamento</p>
+              <h2 className="text-xl font-semibold text-gray-200">Contexts</h2>
+              <p className="text-gray-400">Organize your tags into contexts to make management easier</p>
             </div>
             
             <Dialog open={showNewContextModal} onOpenChange={setShowNewContextModal}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
                   <Plus className="w-4 h-4 mr-2" />
-                  Novo Contexto
+                  New Context
                 </Button>
               </DialogTrigger>
               <DialogContent className="glass-strong border-white/20">
                 <DialogHeader>
-                  <DialogTitle>Criar Novo Contexto</DialogTitle>
+                  <DialogTitle>Create new Context</DialogTitle>
                   <DialogDescription>
-                    Crie um novo contexto para organizar suas tags
+                    Create a new context to organize your tags
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="context-name">Nome do Contexto</Label>
+                    <Label htmlFor="context-name">Context name</Label>
                     <Input
                       id="context-name"
                       placeholder="Ex: Dados Cadastrais"
@@ -686,10 +686,10 @@ const SettingsPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="context-description">Descrição</Label>
+                    <Label htmlFor="context-description">Description</Label>
                     <Textarea
                       id="context-description"
-                      placeholder="Descreva o propósito deste contexto..."
+                      placeholder="Describe the purpose of this context..."
                       value={newContextData.description}
                       onChange={(e) => setNewContextData(prev => ({
                         ...prev,
@@ -709,7 +709,7 @@ const SettingsPage: React.FC = () => {
                       className="border-white/20"
                       disabled={saving}
                     >
-                      Cancelar
+                      Cancel
                     </Button>
                     <Button
                       onClick={handleCreateContext}
@@ -722,7 +722,7 @@ const SettingsPage: React.FC = () => {
                           Criando...
                         </>
                       ) : (
-                        'Criar Contexto'
+                        'Create Context'
                       )}
                     </Button>
                   </div>
@@ -735,9 +735,9 @@ const SettingsPage: React.FC = () => {
             <Card className="glass-card border-white/20 text-center py-12">
               <CardHeader>
                 <Folder className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                <CardTitle>Nenhum contexto criado</CardTitle>
+                <CardTitle>No context created</CardTitle>
                 <CardDescription>
-                  Crie seu primeiro contexto para organizar suas tags
+                  Create your first context to organize your tags
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -774,14 +774,14 @@ const SettingsPage: React.FC = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent className="glass-strong border-white/20">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                <AlertDialogTitle>Confirm exclusion</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Tem certeza que deseja excluir o contexto "{context.name}"? Esta ação não pode ser desfeita.
+                                  Are you sure you want to exclude o context "{context.name}"? This can't be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel className="border-white/20">
-                                  Cancelar
+                                  Cancel
                                 </AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={() => handleDeleteContext(context.id)}
@@ -811,18 +811,18 @@ const SettingsPage: React.FC = () => {
             </div>
           )}
 
-          {/* Modal Editar Contexto */}
+          {/* Modal Edit Context */}
           <Dialog open={showEditContextModal} onOpenChange={setShowEditContextModal}>
             <DialogContent className="glass-strong border-white/20">
               <DialogHeader>
-                <DialogTitle>Editar Contexto</DialogTitle>
+                <DialogTitle>Edit Context</DialogTitle>
                 <DialogDescription>
-                  Edite as informações do contexto "{editingContext?.name}"
+                  Edite as informações do context "{editingContext?.name}"
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="edit-context-name">Nome do Contexto</Label>
+                  <Label htmlFor="edit-context-name">Context name</Label>
                   <Input
                     id="edit-context-name"
                     value={newContextData.name}
@@ -835,7 +835,7 @@ const SettingsPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-context-description">Descrição</Label>
+                  <Label htmlFor="edit-context-description">Description</Label>
                   <Textarea
                     id="edit-context-description"
                     value={newContextData.description}
@@ -857,7 +857,7 @@ const SettingsPage: React.FC = () => {
                     className="border-white/20"
                     disabled={saving}
                   >
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button
                     onClick={handleUpdateContext}

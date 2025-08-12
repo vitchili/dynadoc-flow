@@ -189,13 +189,13 @@ const DocumentsPage: React.FC = () => {
       setNewTemplateData({ name: '', description: '' });
       setShowNewTemplateModal(false);
       toast({
-        title: "Template criado!",
-        description: "Seu novo template foi criado com sucesso.",
+        title: "Template created!",
+        description: "Your new template was created with success.",
       });
     } catch (error) {
       toast({
-        title: "Erro ao criar template",
-        description: "Não foi possível criar o template.",
+        title: "Error",
+        description: "It wasn't possible to create your template.",
         variant: "destructive",
       });
     }
@@ -246,13 +246,13 @@ const DocumentsPage: React.FC = () => {
       setNewSectionData({ name: '', description: '', htmlContent: '', templateId: '' });
       setShowNewSectionModal(false);
       toast({
-        title: "Seção criada!",
-        description: "A nova seção foi criada com sucesso.",
+        title: "Section Created!",
+        description: "The new section was created",
       });
     } catch (error) {
       toast({
-        title: "Erro ao criar seção",
-        description: "Não foi possível criar a seção.",
+        title: "Error",
+        description: "It wasnt possible to create the section.",
         variant: "destructive",
       });
     }
@@ -293,7 +293,7 @@ const DocumentsPage: React.FC = () => {
   };
 
   const handleDeleteSection = async (sectionId: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta seção?')) return;
+    if (!confirm('Are you sure you want to exclude esta seção?')) return;
 
     try {
       await api.deleteSection(sectionId);
@@ -357,7 +357,7 @@ const DocumentsPage: React.FC = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="glass-card p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300">Carregando documentos...</p>
+          <p className="text-gray-300">Loading Templates...</p>
         </div>
       </div>
     );
@@ -369,26 +369,26 @@ const DocumentsPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold gradient-text">Meus Templates</h1>
-            <p className="text-gray-300 mt-2">Gerencie seus templates e seções</p>
+            <p className="text-gray-300 mt-2">Manage your templates and sections</p>
           </div>
           
           <Dialog open={showNewTemplateModal} onOpenChange={setShowNewTemplateModal}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800">
                 <Plus className="w-4 h-4 mr-2" />
-                Novo Template
+                New Template
               </Button>
             </DialogTrigger>
             <DialogContent className="glass-strong border-white/20">
               <DialogHeader>
-                <DialogTitle>Criar Novo Template</DialogTitle>
+                <DialogTitle>Create New Template</DialogTitle>
                 <DialogDescription>
-                  Preencha as informações do novo template
+                  Fill in the information for the new template
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="template-name">Nome do Template</Label>
+                  <Label htmlFor="template-name">Template Name</Label>
                   <Input
                     id="template-name"
                     placeholder="Ex: Template de Prestação de Serviços"
@@ -401,7 +401,7 @@ const DocumentsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="template-description">Descrição</Label>
+                  <Label htmlFor="template-description">Description</Label>
                   <Textarea
                     id="template-description"
                     placeholder="Descreva o propósito deste template..."
@@ -419,14 +419,14 @@ const DocumentsPage: React.FC = () => {
                     onClick={() => setShowNewTemplateModal(false)}
                     className="border-white/20"
                   >
-                    Cancelar
+                    Cancel
                   </Button>
                   <Button
                     onClick={handleCreateTemplate}
                     disabled={!newTemplateData.name.trim()}
                     className="bg-gradient-to-r from-gray-500 to-gray-700"
                   >
-                    Criar Template
+                    Create Template
                   </Button>
                 </div>
               </div>
@@ -440,7 +440,7 @@ const DocumentsPage: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
               type="text"
-              placeholder="Pesquisar templates..."
+              placeholder="Search templates..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyPress={handleSearchKeyPress}
@@ -452,7 +452,7 @@ const DocumentsPage: React.FC = () => {
             variant="outline"
             className="border-white/20"
           >
-            Pesquisar
+            Search
           </Button>
         </div>
 
@@ -524,14 +524,14 @@ const DocumentsPage: React.FC = () => {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent className="glass-strong border-white/20">
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                    <AlertDialogTitle>Confirm exclusion</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Tem certeza que deseja excluir o template "{template.name}" e todas as suas seções? Esta ação não pode ser desfeita.
+                                      Are you sure you want to exclude o template "{template.name}" e todas as suas seções? This can't be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel className="border-white/20">
-                                      Cancelar
+                                      Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() => handleDeleteTemplate(template.id, template.name)}
@@ -589,11 +589,11 @@ const DocumentsPage: React.FC = () => {
                           {sectionsLoading && selectedTemplate?.id === template.id ? (
                             <div className="text-center py-8">
                               <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                              <p className="text-gray-400">Carregando seções...</p>
+                              <p className="text-gray-400">Loading Sections...</p>
                             </div>
                           ) : sections.length === 0 && selectedTemplate?.id === template.id ? (
                             <div className="text-center py-8 text-gray-400">
-                              <p>Nenhuma seção criada ainda</p>
+                              <p>No section created yet.</p>
                             </div>
                           ) : (
                             selectedTemplate?.id === template.id && (
@@ -660,7 +660,7 @@ const DocumentsPage: React.FC = () => {
         <Dialog open={showNewSectionModal} onOpenChange={setShowNewSectionModal}>
           <DialogContent className="glass-strong border-white/20 max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Criar Nova Seção</DialogTitle>
+              <DialogTitle>Create Nova Seção</DialogTitle>
               <DialogDescription>
                 Adicione uma nova seção ao template "{selectedTemplate?.name}"
               </DialogDescription>
@@ -680,7 +680,7 @@ const DocumentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="section-description">Descrição Breve</Label>
+                <Label htmlFor="section-description">Description Breve</Label>
                 <Input
                   id="section-description"
                   placeholder="Ex: Estabelece as condições gerais entre as partes"
@@ -710,32 +710,32 @@ const DocumentsPage: React.FC = () => {
                   onClick={() => setShowNewSectionModal(false)}
                   className="border-white/20"
                 >
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button
                   onClick={handleCreateSection}
                   disabled={!newSectionData.name.trim()}
                   className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900"
                 >
-                  Criar Seção
+                  Create Seção
                 </Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Modal Editar Template */}
+        {/* Modal Edit Template */}
         <Dialog open={showEditTemplateModal} onOpenChange={setShowEditTemplateModal}>
           <DialogContent className="glass-strong border-white/20">
             <DialogHeader>
-              <DialogTitle>Editar Template</DialogTitle>
+              <DialogTitle>Edit Template</DialogTitle>
               <DialogDescription>
-                Edite as informações do template "{editingTemplate?.name}"
+                Edit template information"{editingTemplate?.name}"
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="edit-template-name">Nome do Template</Label>
+                <Label htmlFor="edit-template-name">Template Name</Label>
                 <Input
                   id="edit-template-name"
                   placeholder="Ex: Template de Prestação de Serviços"
@@ -748,7 +748,7 @@ const DocumentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-template-description">Descrição</Label>
+                <Label htmlFor="edit-template-description">Description</Label>
                 <Textarea
                   id="edit-template-description"
                   placeholder="Descreva o propósito deste template..."
@@ -766,7 +766,7 @@ const DocumentsPage: React.FC = () => {
                   onClick={() => setShowEditTemplateModal(false)}
                   className="border-white/20"
                 >
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button
                   onClick={handleUpdateTemplate}
@@ -780,11 +780,11 @@ const DocumentsPage: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Modal Editar Seção */}
+        {/* Modal Edit Seção */}
         <Dialog open={showEditSectionModal} onOpenChange={setShowEditSectionModal}>
           <DialogContent className="glass-strong border-white/20 max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Editar Seção</DialogTitle>
+              <DialogTitle>Edit Seção</DialogTitle>
               <DialogDescription>
                 Edite a seção "{editingSection?.name}"
               </DialogDescription>
@@ -803,7 +803,7 @@ const DocumentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-section-description">Descrição Breve</Label>
+                <Label htmlFor="edit-section-description">Description Breve</Label>
                 <Input
                   id="edit-section-description"
                   value={newSectionData.description}
@@ -831,7 +831,7 @@ const DocumentsPage: React.FC = () => {
                   onClick={() => setShowEditSectionModal(false)}
                   className="border-white/20"
                 >
-                  Cancelar
+                  Cancel
                 </Button>
                 <Button
                   onClick={handleUpdateSection}

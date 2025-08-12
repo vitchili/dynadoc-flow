@@ -36,8 +36,8 @@ const FilesPage: React.FC = () => {
       setFilesData(response);
     } catch (error) {
       toast({
-        title: "Erro ao carregar arquivos",
-        description: "Não foi possível carregar os arquivos gerados.",
+        title: "Erro ao carregar files",
+        description: "Não foi possível carregar os files gerados.",
         variant: "destructive",
       });
     } finally {
@@ -51,12 +51,12 @@ const FilesPage: React.FC = () => {
       await api.downloadGeneratedFile(fileId);
       toast({
         title: "Download iniciado",
-        description: "O arquivo está sendo baixado.",
+        description: "O file está sendo baixado.",
       });
     } catch (error) {
       toast({
         title: "Erro no download",
-        description: "Não foi possível baixar o arquivo.",
+        description: "Não foi possível baixar o file.",
         variant: "destructive",
       });
     } finally {
@@ -86,7 +86,7 @@ const FilesPage: React.FC = () => {
         <div className="flex items-center justify-center py-20">
           <div className="glass-card p-8 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-            <p className="text-gray-300">Carregando arquivos...</p>
+            <p className="text-gray-300">Loading files...</p>
           </div>
         </div>
       </div>
@@ -96,27 +96,27 @@ const FilesPage: React.FC = () => {
   return (
     <div className="container mx-auto px-2">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 gradient-text">Arquivos Gerados</h1>
-        <p className="text-gray-300">Visualize e baixe todos os arquivos que foram gerados</p>
+        <h1 className="text-3xl font-bold mb-2 gradient-text">Generated Files</h1>
+        <p className="text-gray-300">View and download all the files that were generated.</p>
       </div>
 
         <Card className="glass-card border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Histórico de Arquivos
+              File History
             </CardTitle>
             <CardDescription>
-              Lista de todos os arquivos gerados a partir dos seus modelos de template
+              List of all files generated from your template models
             </CardDescription>
           </CardHeader>
           <CardContent>
             {filesData.files.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-semibold mb-2">Nenhum arquivo encontrado</h3>
+                <h3 className="text-lg font-semibold mb-2">No file found</h3>
                 <p className="text-gray-400">
-                  Você ainda não gerou nenhum arquivo. Vá para a página de Lote para gerar seus primeiros arquivos.
+                  You haven't generated any files yet. Go to the Batch page to generate your first files
                 </p>
               </div>
             ) : (
@@ -124,7 +124,7 @@ const FilesPage: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/20">
-                      <th className="text-left py-3 px-4 font-semibold">Nome do Modelo</th>
+                      <th className="text-left py-3 px-4 font-semibold">Template name</th>
                       <th className="text-left py-3 px-4 font-semibold">Data de Geração</th>
                       <th className="text-right py-3 px-4 font-semibold">Ações</th>
                     </tr>

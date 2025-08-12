@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
     }
 
     if (!formData.password) {
-      newErrors.password = 'Senha é obrigatória';
+      newErrors.password = 'Password is required';
     }
 
     setErrors(newErrors);
@@ -67,7 +67,7 @@ const LoginPage: React.FC = () => {
         rememberMe: formData.rememberMe,
       });
     } catch (error) {
-      // Erro já é tratado no contexto de autenticação
+      // Erro já é tratado no context de autenticação
     } finally {
       setIsSubmitting(false);
     }
@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
             </div>
             <CardTitle className="text-2xl gradient-text">DynaDocument</CardTitle>
             <CardDescription className="text-gray-300">
-              Entre para gerenciar seus documentos
+              Sign in to manage your documents.
             </CardDescription>
             <div className="mt-2 text-sm text-gray-400 bg-blue-500/10 p-2 rounded border border-blue-500/20">
               <strong>Demo:</strong> admin@example.com / password
@@ -108,7 +108,7 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -147,7 +147,7 @@ const LoginPage: React.FC = () => {
                     }
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-300">
-                    Lembrar-me
+                    Remember me
                   </Label>
                 </div>
 
@@ -155,7 +155,7 @@ const LoginPage: React.FC = () => {
                   to="/forgot-password"
                   className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
                 >
-                  Esqueci minha senha
+                  Forgot my password
                 </Link>
               </div>
 
@@ -167,10 +167,10 @@ const LoginPage: React.FC = () => {
                 {isSubmitting || isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Entrando...
+                    Signing in...
                   </>
                 ) : (
-                  'Entrar'
+                  'Sign in'
                 )}
               </Button>
             </form>

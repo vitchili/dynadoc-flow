@@ -17,7 +17,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="glass-card p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300">Carregando...</p>
+          <p className="text-gray-300">Loading...</p>
         </div>
       </div>
     );
