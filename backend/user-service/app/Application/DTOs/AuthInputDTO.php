@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-final class AuthInputDTO extends AbstractDTO
+final class AuthInputDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $email,

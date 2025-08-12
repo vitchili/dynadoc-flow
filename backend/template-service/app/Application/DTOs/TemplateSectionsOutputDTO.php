@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use App\Domain\Entities\Template;
 use App\Domain\Entities\Section;
 use Illuminate\Support\Collection;
 
-final class TemplateSectionsOutputDTO extends AbstractDTO
+final class TemplateSectionsOutputDTO extends BaseDTO
 {
     /**
      * @param Template $template

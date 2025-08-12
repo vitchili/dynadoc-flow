@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use App\Domain\Enums\FileStatusEnum;
 
-final class FindByFiltersFileInputDTO extends AbstractDTO
+final class FindByFiltersFileInputDTO extends BaseDTO
 {
     public function __construct(
         public readonly ?string $id,

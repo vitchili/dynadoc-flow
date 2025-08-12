@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use Illuminate\Support\Collection;
 
-final class FileContentInputDTO extends AbstractDTO
+final class FileContentInputDTO extends BaseDTO
 {
     /**
      * @param object $template

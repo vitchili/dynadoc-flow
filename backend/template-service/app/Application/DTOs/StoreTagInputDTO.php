@@ -3,11 +3,11 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use App\Domain\Enums\TagTypeEnum;
 use Illuminate\Support\Str;
 
-final class StoreTagInputDTO extends AbstractDTO
+final class StoreTagInputDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $name,

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-final class AuthOutputDTO extends AbstractDTO
+final class AuthOutputDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $id,

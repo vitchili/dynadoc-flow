@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace App\Domain\Entities;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use Illuminate\Support\Str;
 
-final class Context extends AbstractDTO
+final class Context extends BaseDTO
 {
     public function __construct(
         public string $id,

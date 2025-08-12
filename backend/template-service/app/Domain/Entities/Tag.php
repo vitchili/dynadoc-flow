@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace App\Domain\Entities;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 use App\Domain\Enums\TagTypeEnum;
 use \DateTimeImmutable;
 use Illuminate\Support\Str;
 
-final class Tag extends AbstractDTO
+final class Tag extends BaseDTO
 {
     public function __construct(
         public string $id,

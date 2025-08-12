@@ -3,9 +3,9 @@ declare(strict_types = 1);
 
 namespace App\Application\DTOs;
 
-use App\Application\DTOs\AbstractDTO;
+use App\Application\DTOs\BaseDTO;
 
-final class FindByFiltersFileOutputDTO extends AbstractDTO
+final class FindByFiltersFileOutputDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $id,
