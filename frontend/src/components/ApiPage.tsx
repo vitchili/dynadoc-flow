@@ -37,14 +37,14 @@ const ApiPage: React.FC = () => {
       setCopied(true);
       toast({
         title: "Copiado!",
-        description: "Modelo JSON copiado para a área de transferência.",
+        description: "JSON Model copiado para a área de transferência.",
       });
       
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível copiar o texto.",
+        title: "Error",
+        description: "It wasn't possible copy the text.",
         variant: "destructive",
       });
     }
@@ -58,12 +58,11 @@ const ApiPage: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Code className="w-8 h-8 text-purple-400" />
             <h1 className="text-3xl font-bold text-white">
-              Documentação da API
+              API Documentation
             </h1>
           </div>
           <p className="text-gray-300 text-lg mx-auto">
-            Utilize esta documentação para integrar a geração de templates em suas aplicações.
-            Envie os dados via JSON para gerar múltiplos templates dinamicamente.
+            Use this documentation to integrate template generation into your applications. Send data via JSON to generate multiple templates dynamically.
           </p>
         </div>
 
@@ -73,24 +72,22 @@ const ApiPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-purple-500" />
-                <span>Endpoint de Geração</span>
+                <span>Generation Endpoint</span>
               </CardTitle>
               <CardDescription>
-                Informações sobre o endpoint para gerar templates
+                Information about the endpoint to generate templates.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-gray-900/50 p-4 rounded-lg">
                 <p className="text-green-400 font-mono text-sm">
-                  POST /templates/generate
+                  POST /files/async-generate
                 </p>
               </div>
               <div className="space-y-2">
-                <h4 className="font-semibold text-purple-300">Descrição:</h4>
+                <h4 className="font-semibold text-purple-300">Description:</h4>
                 <p className="text-gray-300">
-                  Este endpoint recebe um array de objetos JSON, onde cada objeto representa os dados
-                  para gerar um template. As chaves devem corresponder aos nomes das tags cadastradas,
-                  e os valores são os dados reais que substituirão as tags no documento.
+                  This endpoint receives an array of JSON objects, where each object represents the data to generate a template. The keys must match the registered tag names, and the values are the actual data that will replace the tags in the document.
                 </p>
               </div>
             </CardContent>
@@ -101,10 +98,10 @@ const ApiPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Code className="w-5 h-5 text-purple-500" />
-                <span>Modelo JSON</span>
+                <span>JSON Model</span>
               </CardTitle>
               <CardDescription>
-                Modelo baseado nas suas tags cadastradas
+                Model based on your registered tags
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -128,15 +125,14 @@ const ApiPage: React.FC = () => {
                     ) : (
                       <Copy className="w-4 h-4 mr-2" />
                     )}
-                    {copied ? 'Copiado!' : 'Copiar Modelo JSON'}
+                    {copied ? 'Copiado!' : 'Copiar JSON Model'}
                   </Button>
                 </>
               ) : (
                 <div className="text-center py-8">
                   <Info className="w-12 h-12 text-gray-500 mx-auto mb-4" />
                   <p className="text-gray-400">
-                    Nenhuma tag cadastrada encontrada. 
-                    Cadastre tags nas configurações para gerar o modelo JSON.
+                    No registered tag found. Register tags in the settings to generate the JSON model.
                   </p>
                 </div>
               )}
@@ -148,10 +144,10 @@ const ApiPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-purple-500" />
-                <span>Como Usar</span>
+                <span>How to use</span>
               </CardTitle>
               <CardDescription>
-                Instruções para utilizar a API
+                Instructions to use the API
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -161,9 +157,9 @@ const ApiPage: React.FC = () => {
                     1
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">Copie o modelo JSON</h4>
+                    <h4 className="font-semibold text-white">Copy the JSON model</h4>
                     <p className="text-gray-400 text-sm">
-                      Use o botão "Copiar Modelo JSON" para obter a estrutura base.
+                      Use the "Copy JSON Model" button to get the base structure.
                     </p>
                   </div>
                 </div>
@@ -172,9 +168,9 @@ const ApiPage: React.FC = () => {
                     2
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">Preencha os valores</h4>
+                    <h4 className="font-semibold text-white">Set the values</h4>
                     <p className="text-gray-400 text-sm">
-                      Substitua as aspas duplas vazias pelos valores reais correspondentes a cada tag.
+                      Replace the empty double quotes with the actual values corresponding to each tag.
                     </p>
                   </div>
                 </div>
@@ -183,9 +179,9 @@ const ApiPage: React.FC = () => {
                     3
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">Envie a requisição</h4>
+                    <h4 className="font-semibold text-white">Make the request</h4>
                     <p className="text-gray-400 text-sm">
-                      Faça uma requisição POST para /templates/generate com o array JSON preenchido.
+                      Make a POST request to /files/async-generate with the filled JSON array.
                     </p>
                   </div>
                 </div>

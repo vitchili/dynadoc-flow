@@ -7,10 +7,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(JwtAuthMiddleware::class)->group(function () {
     Route::prefix('files')->controller(FileController::class)->group(function () {
         Route::get('/filters', 'findByFilters');
-        // TODO sync generate - Route::post('/generate', 'generate');
         Route::post('/async-generate', 'asyncGenerate');
         Route::delete('/{fileId}', 'destroy');
-        // TODO - Async Batch Generate
         Route::get('/download/{fileId}', 'download');
     });
 });

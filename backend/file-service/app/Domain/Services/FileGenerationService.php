@@ -2,31 +2,38 @@
 
 namespace App\Domain\Services;
 
-use Knp\Snappy\Pdf;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class FileGenerationService
 {
-    public function __construct(protected Pdf $pdf) {}
+    protected Dompdf $pdf;
+
+    public function __construct()
+    {
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Arial');
+        $this->pdf = new Dompdf($options);
+    }
 
     public function generate(string $fileName, string $htmlContent): string
     {
-        $options = [
-            'page-size'    => 'A4',
-            'orientation'  => 'Portrait',
-            'margin-top'   => 10,
-            'margin-right' => 10,
-            'margin-bottom'=> 10,
-            'margin-left'  => 10,
-        ];
-
-        $this->pdf->setOptions($options);
-
         $uniqidFileName = $fileName . '_' . uniqid() . '.pdf';
         $outputPath = storage_path('app/public/tmp/' . $uniqidFileName);
 
         $htmlContent = mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8');
 
-        $this->pdf->generateFromHtml($htmlContent, $outputPath);
+        $this->pdf->loadHtml($htmlContent);
+
+        $this->pdf->setPaper('A4', 'portrait');
+
+        $this->pdf->render();
+
+        file_put_contents($outputPath, $this->pdf->output());
+
+        $this->pdf->stream($uniqidFileName);
 
         return $uniqidFileName;
     }

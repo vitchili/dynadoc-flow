@@ -20,17 +20,15 @@ class TemplateRequestedConsumer extends Command
 
     public function handle(): int
     {
-        $this->info('Iniciando consumo de solicitações de template...');
-
         Kafka::consumer()
             ->subscribe('template.requested')
             ->withHandler(function (ConsumedMessage $message) {
-                $message = json_encode($message->getBody());
-                $templateId = json_decode($message)->templateId;
+                $message = (object) $message->getBody();
+                $templateId = $message->templateId;
 
-                $templateSectionsOutputDTO = $this->deliverTemplateHandler->execute($templateId);
+               $this->deliverTemplateHandler->execute($templateId);
 
-                echo "Mensagem recebida: " . $templateId  . PHP_EOL;
+                echo "Message receive: " . $templateId  . PHP_EOL;
             })
             ->build()
             ->consume();

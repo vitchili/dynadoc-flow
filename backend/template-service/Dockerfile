@@ -2,7 +2,7 @@ FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y \
     git unzip curl libpng-dev libonig-dev libxml2-dev zip libzip-dev \
-    librdkafka-dev libzstd-dev libssl-dev wkhtmltopdf \
+    librdkafka-dev libzstd-dev libssl-dev \
     libicu-dev libprotobuf-dev protobuf-compiler \
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \

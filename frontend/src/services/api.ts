@@ -269,7 +269,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar seções');
+        throw new Error(errorData.message || 'Erro ao buscar sections');
       }
       
       const apiResponse = await response.json();
@@ -292,7 +292,7 @@ const api = {
       return data
 
     } catch (error) {
-      throw new Error('Erro ao consultar contextos');
+      throw new Error('Erro ao consultar contexts');
     }
   },
 
@@ -388,7 +388,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar contextos');
+        throw new Error(errorData.message || 'Erro ao buscar contexts');
       }
       
       const apiResponse = await response.json();
@@ -406,7 +406,7 @@ const api = {
       return data
 
     } catch (error) {
-      throw new Error('Erro ao consultar contextos');
+      throw new Error('Erro ao consultar contexts');
     }
     
   },
@@ -426,7 +426,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar contexto');
+        throw new Error(errorData.message || 'Erro ao cadastrar context');
       }
       
       const apiResponse = await response.json();
@@ -452,7 +452,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar contexto');
+        throw new Error(errorData.message || 'Erro ao atualizar context');
       }
       
       const apiResponse = await response.json();
@@ -477,7 +477,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao excluir contexto');
+        throw new Error(errorData.message || 'Erro ao excluir context');
       }
     } catch (error) {
       throw new Error(error.message);
@@ -524,7 +524,7 @@ const api = {
       return data
 
     } catch (error) {
-      throw new Error('Erro ao consultar contextos');
+      throw new Error('Erro ao consultar contexts');
     }
   },
 
@@ -654,7 +654,7 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar arquivos');
+        throw new Error(errorData.message || 'Erro ao buscar files');
       }
       
       const apiResponse = await response.json();
@@ -683,7 +683,7 @@ const api = {
     };
 
     } catch (error) {
-      throw new Error('Erro ao consultar contextos');
+      throw new Error('Erro ao consultar contexts');
     }
   },
 
@@ -701,13 +701,13 @@ const api = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao baixar arquivo');
+        throw new Error(errorData.message || 'Erro ao baixar file');
       }
       
       await response.json();
 
     } catch (error) {
-      throw new Error('Erro ao baixar arquivo');
+      throw new Error('Erro ao baixar file');
     }
   }
 };

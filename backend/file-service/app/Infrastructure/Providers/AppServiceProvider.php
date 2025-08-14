@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton( \Illuminate\Contracts\Debug\ExceptionHandler::class, ExceptionHandler::class );
         
         $this->app->singleton(Pdf::class, function () {
-            return new Pdf('/usr/bin/wkhtmltopdf');
+            return new Pdf('/usr/local/bin/wkhtmltopdf');
         });
         
         $this->app->singleton(LoggedUserHelper::class, function ($app) {

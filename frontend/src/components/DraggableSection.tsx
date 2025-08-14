@@ -118,14 +118,14 @@ const DraggableSection: React.FC<DraggableSectionProps> = ({
             </AlertDialogTrigger>
             <AlertDialogContent className="glass-strong border-white/20">
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                <AlertDialogTitle>Confirm exclusion</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tem certeza que deseja excluir a seção "{section.name}"? Esta ação não pode ser desfeita.
+                  Are you sure you want to exclude a seção "{section.name}"? This can't be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel className="border-white/20">
-                  Cancelar
+                  Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => onDelete(section.id)}

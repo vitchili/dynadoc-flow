@@ -10,7 +10,6 @@ use App\Domain\Entities\Section;
 use App\Domain\Entities\Template;
 use App\Domain\Repositories\SectionRepositoryInterface;
 use App\Domain\Repositories\TemplateRepositoryInterface;
-use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class DeliverTemplateHandler

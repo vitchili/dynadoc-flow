@@ -59,7 +59,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Meus Templates
+              My Templates
             </Link>
             {/* <Link
               to="/batch"
@@ -79,7 +79,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Arquivos Gerados
+              Generated Files
             </Link>
             <Link
               to="/api"
@@ -99,7 +99,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Configurações
+              Settings
             </Link>
           </nav>
 
@@ -135,7 +135,7 @@ const Header: React.FC = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center space-x-2">
                     <User className="w-4 h-4" />
-                    <span>Meu Perfil</span>
+                    <span>My Profile</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/20" />
@@ -161,7 +161,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Meus Templates
+                My Templates
               </Link>
               <Link
                 to="/batch"
@@ -183,7 +183,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Arquivos Gerados
+                Generated Files
               </Link>
               <Link
                 to="/api"
@@ -205,14 +205,14 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Configurações
+                Settings
               </Link>
               <Link
                 to="/profile"
                 className="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Meu Perfil
+                My Profile
               </Link>
               <Button
                 variant="ghost"

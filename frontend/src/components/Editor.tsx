@@ -141,7 +141,7 @@ const Editor: React.FC<EditorProps> = ({ htmlContent, onChange, tags, placeholde
 
     // Group filtered tags by context
     const groupedTags = filteredTags.reduce((groups, tag) => {
-      const contextName = tag.context?.name || 'Sem Contexto';
+      const contextName = tag.context?.name || 'Sem Context';
       if (!groups[contextName]) {
         groups[contextName] = [];
       }
@@ -498,7 +498,7 @@ const Editor: React.FC<EditorProps> = ({ htmlContent, onChange, tags, placeholde
 
         <Separator orientation="vertical" className="h-6 bg-white/20" />
 
-        {/* Tags dinâmicas organizadas por contexto */}
+        {/* Tags dinâmicas organizadas por context */}
         <div className="relative">
           <Button
             variant="ghost"
@@ -519,7 +519,7 @@ const Editor: React.FC<EditorProps> = ({ htmlContent, onChange, tags, placeholde
                   <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
                     type="text"
-                    placeholder="Pesquisar tags..."
+                    placeholder="Search tags..."
                     value={tagSearchQuery}
                     onChange={(e) => setTagSearchQuery(e.target.value)}
                     className="pl-10 h-8 bg-white border-gray-300 text-gray-900 placeholder-gray-500 text-sm"

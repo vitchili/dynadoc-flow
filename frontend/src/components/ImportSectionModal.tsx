@@ -67,7 +67,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível carregar as seções do template selecionado.",
+        description: "Não foi possível carregar as sections do template selecionado.",
         variant: "destructive",
       });
     } finally {
@@ -94,7 +94,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
     if (!selectedTemplate) {
       toast({
         title: "Atenção",
-        description: "Selecione um template para importar as seções.",
+        description: "Select a template para importar as sections.",
       });
       return;
     }
@@ -119,7 +119,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível importar as seções.",
+        description: "Não foi possível importar as sections.",
         variant: "destructive",
       });
     } finally {
@@ -144,14 +144,14 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
         <DialogHeader>
           <DialogTitle>Importar Seções</DialogTitle>
           <DialogDescription>
-            Selecione um template e as seções que deseja importar para "{targetTemplate.name}"
+            Select a template e as sections que deseja importar para "{targetTemplate.name}"
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Search Templates */}
           <div>
-            <Label htmlFor="search-templates">Pesquisar Templates</Label>
+            <Label htmlFor="search-templates">Search Templates</Label>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
@@ -168,12 +168,12 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
           {loading ? (
             <div className="flex items-center justify-center">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
-              Carregando templates...
+              Loading templates...
             </div>
           ) : (
             <div className="space-y-2">
               {filteredTemplates.length === 0 ? (
-                <p className="text-gray-400">Nenhum template encontrado.</p>
+                <p className="text-gray-400">No template found.</p>
               ) : (
                 filteredTemplates.map(template => (
                   <Button
@@ -198,7 +198,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
               {sectionsLoading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="w-6 h-6 animate-spin mr-2" />
-                  Carregando seções...
+                  Loading sections...
                 </div>
               ) : sections.length === 0 ? (
                 <p className="text-gray-400">Nenhuma seção encontrada neste template.</p>
@@ -223,7 +223,7 @@ const ImportSectionModal: React.FC<ImportSectionModalProps> = ({
 
         <div className="flex justify-end space-x-2 mt-4">
           <Button variant="outline" onClick={handleClose} className="border-white/20">
-            Cancelar
+            Cancel
           </Button>
           <Button onClick={handleImport} disabled={loading} className="bg-gradient-to-r from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900">
             Importar Seções

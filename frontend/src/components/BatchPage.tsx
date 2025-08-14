@@ -60,7 +60,7 @@ const BatchPage: React.FC = () => {
     if (file.size > maxSize) {
       toast({
         title: "Arquivo muito grande",
-        description: "O arquivo deve ter no máximo 10MB.",
+        description: "O file deve ter no máximo 10MB.",
         variant: "destructive"
       });
       return;
@@ -69,7 +69,7 @@ const BatchPage: React.FC = () => {
     if (!allowedTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
       toast({
         title: "Formato inválido",
-        description: "Apenas arquivos Excel (.xlsx, .xls) são aceitos.",
+        description: "Apenas files Excel (.xlsx, .xls) são aceitos.",
         variant: "destructive"
       });
       return;
@@ -105,7 +105,7 @@ const BatchPage: React.FC = () => {
     if (!selectedFile || selectedTemplateIds.length === 0) {
       toast({
         title: "Dados incompletos",
-        description: "Selecione um arquivo Excel e pelo menos um template.",
+        description: "Select a file Excel e pelo menos um template.",
         variant: "destructive"
       });
       return;
@@ -125,7 +125,7 @@ const BatchPage: React.FC = () => {
     } catch (error) {
       toast({
         title: "Erro no processamento",
-        description: "Não foi possível processar o arquivo. Tente novamente.",
+        description: "Não foi possível processar o file. Tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -145,7 +145,7 @@ const BatchPage: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight">Processamento em Lote</h1>
           <p className="text-muted-foreground">
             Gere múltiplos templates automaticamente através de uma planilha Excel. 
-            Faça upload do arquivo com os dados e selecione os modelos de template desejados.
+            Faça upload do file com os dados e selecione os modelos de template desejados.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ const BatchPage: React.FC = () => {
                 <span>Upload do Arquivo Excel</span>
               </CardTitle>
               <CardDescription>
-                Faça upload de um arquivo .xlsx ou .xls com os dados para gerar os templates (máximo 10MB)
+                Faça upload de um file .xlsx ou .xls com os dados para gerar os templates (máximo 10MB)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -198,7 +198,7 @@ const BatchPage: React.FC = () => {
                       <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
                       <div>
                         <p className="text-lg font-medium">
-                          Arraste e solte seu arquivo Excel aqui
+                          Arraste e solte seu file Excel aqui
                         </p>
                         <p className="text-muted-foreground">
                           ou clique para selecionar
@@ -226,7 +226,7 @@ const BatchPage: React.FC = () => {
               {templatesLoading ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  <span className="ml-2">Carregando templates...</span>
+                  <span className="ml-2">Loading templates...</span>
                 </div>
               ) : (
                 <>
@@ -328,7 +328,7 @@ const BatchPage: React.FC = () => {
                     <li>Faça upload de uma planilha Excel com os dados dos templates</li>
                     <li>Selecione os modelos de template que serão usados</li>
                     <li>O sistema gerará um template para cada linha da planilha usando cada modelo selecionado</li>
-                    <li>Todos os templates serão compactados em um arquivo ZIP para download</li>
+                    <li>Todos os templates serão compactados em um file ZIP para download</li>
                   </ul>
                 </div>
               </div>

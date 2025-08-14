@@ -75,7 +75,7 @@ const ProfilePage: React.FC = () => {
     }
 
     if (formData.password && formData.password.length < 8) {
-      newErrors.password = 'Senha deve ter pelo menos 8 caracteres';
+      newErrors.password = 'Password must be at least 8 characters long';
     }
 
     setErrors(newErrors);
@@ -93,10 +93,10 @@ const ProfilePage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validar tipo de arquivo
+      // Validar tipo de file
       if (!file.type.startsWith('image/')) {
         toast({
-          title: "Arquivo inválido",
+          title: "Invalid File",
           description: "Por favor, selecione uma imagem válida.",
           variant: "destructive",
         });
@@ -115,7 +115,7 @@ const ProfilePage: React.FC = () => {
 
       setFormData(prev => ({ ...prev, avatar: file }));
       
-      // Criar preview
+      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatarPreview(e.target?.result as string);
@@ -167,7 +167,7 @@ const ProfilePage: React.FC = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="glass-card p-8 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300">Carregando perfil...</p>
+          <p className="text-gray-300">Loading perfil...</p>
         </div>
       </div>
     );
@@ -248,7 +248,7 @@ const ProfilePage: React.FC = () => {
             <div className="space-y-2">
               <Label htmlFor="password" className="flex items-center space-x-2">
                 <Lock className="w-4 h-4" />
-                <span>Nova Senha</span>
+                <span>New Password</span>
               </Label>
               <Input
                 id="password"
@@ -277,7 +277,7 @@ const ProfilePage: React.FC = () => {
                 onValueChange={(value) => handleInputChange('companyId', value)}
               >
                 <SelectTrigger className="glass bg-white/5 border-white/20">
-                  <SelectValue placeholder="Selecione uma empresa" />
+                  <SelectValue placeholder="Select aa empresa" />
                 </SelectTrigger>
                 <SelectContent className="glass-strong border-white/20">
                   {companies.map((company) => (
@@ -298,7 +298,7 @@ const ProfilePage: React.FC = () => {
                 className="border-white/20"
                 disabled={saving}
               >
-                Cancelar
+                Cancel
               </Button>
               <Button
                 type="submit"
