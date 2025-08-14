@@ -66,17 +66,17 @@ const DocumentsPage: React.FC = () => {
 
   const loadTemplates = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       let response: TemplatesResponse;
-      
+
       if (searchQuery.trim()) {
         response = await api.filterTemplates(searchQuery, currentPage, 10);
       } else {
         response = await api.getTemplates(currentPage, 10);
       }
-      
+
       setTemplatesData(response);
     } catch (error) {
       toast({
@@ -91,7 +91,7 @@ const DocumentsPage: React.FC = () => {
 
   const loadTags = async () => {
     if (!user) return;
-    
+
     try {
       const tagsData = await api.getTags();
       setTags(tagsData);
@@ -121,18 +121,18 @@ const DocumentsPage: React.FC = () => {
 
     const dragSection = sections[dragIndex];
     const hoverSection = sections[hoverIndex];
-    
+
     // Reorder sections array locally for immediate UI feedback
     const newSections = [...sections];
     newSections.splice(dragIndex, 1);
     newSections.splice(hoverIndex, 0, dragSection);
-    
+
     // Update order property based on new positions
     const updatedSections = newSections.map((section, index) => ({
       ...section,
       sectionOrder: index + 1
     }));
-    
+
     setSections(updatedSections);
 
     try {
@@ -155,7 +155,7 @@ const DocumentsPage: React.FC = () => {
 
   const handleTemplateClick = async (template: Template) => {
     setSelectedTemplate(template);
-    
+
     if (expandedTemplates.has(template.id)) {
       setExpandedTemplates(prev => {
         const newSet = new Set(prev);
@@ -371,7 +371,7 @@ const DocumentsPage: React.FC = () => {
             <h1 className="text-3xl font-bold gradient-text">Meus Templates</h1>
             <p className="text-gray-300 mt-2">Manage your templates and sections</p>
           </div>
-          
+
           <Dialog open={showNewTemplateModal} onOpenChange={setShowNewTemplateModal}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800">
@@ -460,9 +460,9 @@ const DocumentsPage: React.FC = () => {
           <Card className="glass-card border-white/20 text-center py-12">
             <CardHeader>
               <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <CardTitle>Nenhum template encontrado</CardTitle>
+              <CardTitle>No templates founded</CardTitle>
               <CardDescription>
-                {searchQuery ? 'Nenhum template corresponde à sua pesquisa' : 'Crie seu primeiro template para começar a organizar seus documentos'}
+                {searchQuery ? 'Nenhum template corresponde à sua pesquisa' : 'Create your new template and start to organize your documents.'}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -626,12 +626,12 @@ const DocumentsPage: React.FC = () => {
               <Pagination className="mt-8">
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
+                    <PaginationPrevious
                       onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                       className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                     />
                   </PaginationItem>
-                  
+
                   {Array.from({ length: templatesData.totalPages }, (_, i) => i + 1).map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
@@ -643,9 +643,9 @@ const DocumentsPage: React.FC = () => {
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-                  
+
                   <PaginationItem>
-                    <PaginationNext 
+                    <PaginationNext
                       onClick={() => handlePageChange(Math.min(templatesData.totalPages, currentPage + 1))}
                       className={currentPage === templatesData.totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                     />

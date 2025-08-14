@@ -31,16 +31,6 @@ class FileController extends BaseController
         return $this->successResponse($output);
     }
 
-    public function asyncGenerate(StoreFileRequest $request, StoreFileHandler $handler): JsonResponse
-    {
-        $output = $handler->execute(new StoreFileInputDTO(
-            templateId: $request->validated('templateId'),
-            name: $request->validated('name'),
-            payload: $request->validated('payload')
-        ));
-
-        return $this->successResponse($output);
-    }
 
     public function destroy(string $fileId, DestroyFileHandler $handler): JsonResponse
     {
@@ -55,5 +45,16 @@ class FileController extends BaseController
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="' . $file->name . '"',
         ]);
+    }
+
+    public function asyncGenerate(StoreFileRequest $request, StoreFileHandler $handler): JsonResponse
+    {
+        $output = $handler->execute(new StoreFileInputDTO(
+            templateId: $request->validated('templateId'),
+            name: $request->validated('name'),
+            payload: $request->validated('payload')
+        ));
+
+        return $this->successResponse($output);
     }
 }

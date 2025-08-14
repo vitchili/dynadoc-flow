@@ -40,6 +40,7 @@ final readonly class FileGenerationHandler
                     $payloadArray = json_decode($file->payload, true);
 
                     $errorMessages = FileTagsValidationService::validate($input->sections, $payloadArray);
+                    
                     if ($errorMessages) {
                         $this->setErrorFile($file, $errorMessages);
                         return;

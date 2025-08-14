@@ -49,8 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { user, token } = await api.login(credentials);
       setUser(user);
       toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vindo(a), ${user.name}!`,
+        title: "Logged In!",
+        description: `Welcome, ${user.name}!`,
       });
     } catch (error) {
       toast({

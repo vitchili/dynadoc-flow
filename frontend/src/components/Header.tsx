@@ -59,7 +59,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Meus Templates
+              My Templates
             </Link>
             {/* <Link
               to="/batch"
@@ -79,7 +79,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Arquivos Gerados
+              Generated Files
             </Link>
             <Link
               to="/api"
@@ -99,7 +99,7 @@ const Header: React.FC = () => {
                   : 'hover:bg-white/10'
               }`}
             >
-              Configurações
+              Settings
             </Link>
           </nav>
 
@@ -161,7 +161,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Meus Templates
+                My Templates
               </Link>
               <Link
                 to="/batch"
@@ -183,7 +183,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Arquivos Gerados
+                Generated Files
               </Link>
               <Link
                 to="/api"
@@ -205,7 +205,7 @@ const Header: React.FC = () => {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Configurações
+                Settings
               </Link>
               <Link
                 to="/profile"

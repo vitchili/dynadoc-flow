@@ -19,13 +19,15 @@ final readonly class StoreFileHandler
 
     public function execute(StoreFileInputDTO $input): string
     {
-        event(new TemplateRequestedEvent($input->templateId));
-
-        return $this->fileRepository->insert(File::create(
+        $fileId = $this->fileRepository->insert(File::create(
             name: $input->name,
             templateId: $input->templateId,
             userId: app(LoggedUserHelper::class)->userId(),
             payload: json_encode($input->payload),
         ));
+
+        event(new TemplateRequestedEvent($input->templateId));
+     
+        return $fileId;
     }
 }
