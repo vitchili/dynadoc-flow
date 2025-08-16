@@ -16,6 +16,21 @@ class AuthController extends BaseController
             password: $request->validated('password'),
         ));
 
-        return $this->successResponse($output);
+        $cookie = cookie(
+            name: 'token',
+            value: $output->token,
+            minutes: (int) env('JWT_TTL', 21000) / 60,
+            path: '/',
+            domain: null,
+            secure: false,
+            httpOnly: true,
+            sameSite: 'Strict'
+        );
+
+        return $this->successResponse([
+            'id' => $output->id,
+            'name' => $output->name,
+            'email' => $output->email,
+        ])->cookie($cookie);
     }
 }
