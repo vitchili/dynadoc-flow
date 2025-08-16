@@ -12,33 +12,18 @@ import {
   CreateContextData,
   UpdateProfileData,
   TemplatesResponse,
-  GeneratedFile,
   GeneratedFilesResponse
 } from '@/types';
 
-const BASE_URL = 'http://localhost:8000/api/';
-
-let authToken: string | null = localStorage.getItem('authToken');
+const BASE_URL = 'http://localhost:8000/api';
 
 const api = {
-  setAuthToken: (token: string | null) => {
-    authToken = token;
-    if (token) {
-      localStorage.setItem('authToken', token);
-    } else {
-      localStorage.removeItem('authToken');
-    }
-  },
-
-  getAuthToken: () => authToken,
-
-  async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+  async login(credentials: LoginCredentials): Promise<{ user: User }> {
     try {
       const response = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(credentials)
       });
 
@@ -48,7 +33,6 @@ const api = {
       }
       
       const apiResponse = await response.json();
-      const token = apiResponse.data.token
 
       const user: User = {
         id: apiResponse.data.id,
@@ -57,41 +41,41 @@ const api = {
         avatar: undefined,
       };
       
-      this.setAuthToken(apiResponse.data.token);
-      return { user, token };
+      return { user };
 
-    } catch (error) {
+    } catch (error){
+      console.log(error.message);
       throw new Error('Credenciais inválidas');
     }
   },
 
   async logout(): Promise<void> {
-    console.log('API: Logout');
-    this.setAuthToken(null);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await fetch(`${BASE_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
   },
 
-  async getUser(id: string): Promise<User> {
-    console.log('API: Get user', id);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    return {
-      id: '1',
-      email: 'admin@example.com',
-      name: 'Admin User',
-    };
+  async getUser(id: string) /*: Promise<User>*/ {
+    // const response = await fetch(`${BASE_URL}/users/${id}`, {
+    //   method: 'GET',
+    //   credentials: 'include',
+    //   headers: { 'Content-Type': 'application/json' },
+    // });
+
+    // if (!response.ok) {
+    //   throw new Error('Erro ao buscar usuário');
+    // }
+
+    // return response.json();
   },
 
-  async getTemplates(page: number = 1, limit: number = 10): Promise<TemplatesResponse> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    try{
+  async getTemplates(page = 1, limit = 10): Promise<TemplatesResponse> {
+    try {
       const response = await fetch(`${BASE_URL}/templates/filters`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -100,17 +84,12 @@ const api = {
       }
       
       const apiResponse = await response.json();
-
-      var allTemplates = []
-
-      apiResponse.data.forEach(element => {
-        allTemplates.push({
-          id: element.id,
-          name: element.name,
-          description: element.description,
-          sections: []
-        })
-      });
+      const allTemplates = apiResponse.data.map((element: any) => ({
+        id: element.id,
+        name: element.name,
+        description: element.description,
+        sections: []
+      }));
   
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
@@ -123,40 +102,30 @@ const api = {
         totalPages: Math.ceil(allTemplates.length / limit)
       };
 
-    } catch (error) {
+    } catch {
       throw new Error('Erro ao consultar templates');
     }
   },
 
-  async filterTemplates(query: string, page: number = 1, limit: number = 10): Promise<TemplatesResponse> {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    try{
+  async filterTemplates(query: string, page = 1, limit = 10): Promise<TemplatesResponse> {
+    try {
       const response = await fetch(`${BASE_URL}/templates/filters`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar templates');
+        throw new Error('Erro ao buscar templates');
       }
       
       const apiResponse = await response.json();
-
-      var allTemplates = []
-
-      apiResponse.data.forEach(element => {
-        allTemplates.push({
-          id: element.id,
-          name: element.name,
-          description: element.description,
-          sections: []
-        })
-      });
+      const allTemplates = apiResponse.data.map((element: any) => ({
+        id: element.id,
+        name: element.name,
+        description: element.description,
+        sections: []
+      }));
 
       const filteredTemplates = allTemplates.filter(template => 
         template.name.toLowerCase().includes(query.toLowerCase())
@@ -172,504 +141,274 @@ const api = {
         page,
         totalPages: Math.ceil(filteredTemplates.length / limit)
       };
-    } catch (error) {
+    } catch {
       throw new Error('Erro ao consultar templates');
     }
   },
 
   async createTemplate(data: CreateTemplateData): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/templates`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(`${BASE_URL}/templates`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar template');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data.id
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao cadastrar template');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data.id;
   },
 
   async updateTemplate(id: string, data: Partial<CreateTemplateData>): Promise<Template> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log(data);
-    try{
-      const response = await fetch(`${BASE_URL}/templates/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(`${BASE_URL}/templates/${id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar template');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar template');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async deleteTemplate(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 800));
+    const response = await fetch(`${BASE_URL}/templates/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/templates/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao excluir templates');
-      }
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao excluir template');
     }
-  },
-
-  async downloadTemplateExample(id: string): Promise<void> {
-    console.log('API: Download template example', id);
-    await new Promise(resolve => setTimeout(resolve, 1000));
   },
 
   async getSections(templateId: string): Promise<Section[]> {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/sections/filters?templateId=${templateId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-      });
+    const response = await fetch(`${BASE_URL}/sections/filters?templateId=${templateId}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar sections');
-      }
-      
-      const apiResponse = await response.json();
-
-      var data = []
-
-      apiResponse.data.forEach(element => {
-        data.push({
-          id: element.id,
-          name: element.name,
-          description: element.description,
-          templateId: element.templateId,
-          htmlContent: element.htmlContent,
-          sectionOrder: element.sectionOrder
-        })
-      });
-
-      data.sort((a, b) => a.sectionOrder - b.sectionOrder);
-  
-      return data
-
-    } catch (error) {
-      throw new Error('Erro ao consultar contexts');
+    if (!response.ok) {
+      throw new Error('Erro ao buscar sections');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data.sort((a: any, b: any) => a.sectionOrder - b.sectionOrder);
   },
 
   async createSection(data: CreateSectionData): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/sections`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(`${BASE_URL}/sections`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar seção');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data.id
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao cadastrar seção');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data.id;
   },
 
   async updateSection(id: string, data: Partial<CreateSectionData>): Promise<boolean> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/sections/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(`${BASE_URL}/sections/${id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar seção');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar seção');
     }
-  },
-
-  async updateSectionOrder(templateId: string, sectionOrders: { id: string; sectionOrder: number }[]): Promise<void> {
-    console.log('API: Update section order', templateId, sectionOrders);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    // Simulate API call to update section orders
+    
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async deleteSection(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const response = await fetch(`${BASE_URL}/sections/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/sections/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao excluir seção');
-      }
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao excluir seção');
     }
   },
 
-  // Contexts CRUD API
   async getContexts(): Promise<Context[]> {
-    try{
-      const response = await fetch(`${BASE_URL}/contexts/filters`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-      });
+    const response = await fetch(`${BASE_URL}/contexts/filters`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar contexts');
-      }
-      
-      const apiResponse = await response.json();
-
-      var data = []
-
-      apiResponse.data.forEach(element => {
-        data.push({
-          id: element.id,
-          name: element.name,
-          description: element.description
-        })
-      });
-  
-      return data
-
-    } catch (error) {
-      throw new Error('Erro ao consultar contexts');
+    if (!response.ok) {
+      throw new Error('Erro ao buscar contexts');
     }
     
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async createContext(data: CreateContextData): Promise<string> {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    const response = await fetch(`${BASE_URL}/contexts`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/contexts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar context');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data.id
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao cadastrar context');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data.id;
   },
 
   async updateContext(id: string, data: CreateContextData): Promise<boolean> {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    const response = await fetch(`${BASE_URL}/contexts/${id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/contexts/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar context');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar context');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async deleteContext(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const response = await fetch(`${BASE_URL}/contexts/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/contexts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao excluir context');
-      }
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao excluir context');
     }
   },
 
-  // Tags API with Context
   async getTags(): Promise<Tag[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-     try{
-      const response = await fetch(`${BASE_URL}/tags/filters`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-      });
+    const response = await fetch(`${BASE_URL}/tags/filters`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar tags');
-      }
-      
-      const apiResponse = await response.json();
-
-      var data = []
-
-      apiResponse.data.forEach(element => {
-        data.push({
-          id: element.id,
-          name: element.name,
-          type: element.typeName,
-          description: element.description,
-          contextId: element.contextId,
-          context: {
-            id: element.context.id,
-            name: element.context.name,
-            description: element.context.description,
-          }
-        })
-      });
-  
-      return data
-
-    } catch (error) {
-      throw new Error('Erro ao consultar contexts');
+    if (!response.ok) {
+      throw new Error('Erro ao buscar tags');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async createTag(data: CreateTagData): Promise<string> {
-    try{
-      const response = await fetch(`${BASE_URL}/tags`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(`${BASE_URL}/tags`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar tag');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data.id
-
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao cadastrar tag');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data.id;
   },
 
   async updateTag(id: string, data: CreateTagData): Promise<Tag> {
-    await new Promise(resolve => setTimeout(resolve, 600));
+    const response = await fetch(`${BASE_URL}/tags/${id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/tags/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar tag');
-      }
-      
-      const apiResponse = await response.json();
-
-      return apiResponse.data.id
-
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar tag');
     }
+    
+    const apiResponse = await response.json();
+    return apiResponse.data;
   },
 
   async deleteTag(id: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const response = await fetch(`${BASE_URL}/tags/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    try{
-      const response = await fetch(`${BASE_URL}/tags/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        }
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao excluir tag');
-      }
-    } catch (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      throw new Error('Erro ao excluir tag');
     }
   },
 
   async getCompanies(userId: string): Promise<Company[]> {
-    console.log('API: Get companies for user', userId);
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    return [
-      { id: '1', name: 'Empresa Exemplo' },
-      { id: '2', name: 'Outra Empresa LTDA' }
-    ];
+    const response = await fetch(`${BASE_URL}/users/${userId}/companies`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao buscar empresas');
+    }
+
+    return response.json();
   },
 
   async updateProfile(data: UpdateProfileData): Promise<User> {
-    console.log('API: Update profile', data);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      id: '1',
-      email: data.email || 'admin@example.com',
-      name: 'Admin User',
-    };
+    const response = await fetch(`${BASE_URL}/users/profile`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar perfil');
+    }
+
+    return response.json();
   },
 
-  async importSections(templateId: string, sectionIds: string[]): Promise<void> {
-    console.log('API: Import sections', templateId, sectionIds);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  },
+  async getGeneratedFiles(page = 1, limit = 10): Promise<GeneratedFilesResponse> {
+    const response = await fetch(`${BASE_URL}/files/filters`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-  async processBatchTemplates(templateIds: string[], file: File): Promise<void> {
-    console.log('API: Process batch templates', templateIds, file.name);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (!response.ok) {
+      throw new Error('Erro ao buscar arquivos');
+    }
     
-    // Simulate file processing and ZIP download
-    const link = document.createElement('a');
-    link.href = 'data:application/zip;base64,UEsDBAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAbXlmaWxlLnR4dFBLAQIUAAoAAAAAAIdYZ1QAAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAABteWZpbGUudHh0UEsFBgAAAAABAAEANwAAAB8AAAAAAA==';
-    link.download = `templates_lote_${Date.now()}.zip`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  },
-
-  async getGeneratedFiles(page: number = 1, limit: number = 10): Promise<GeneratedFilesResponse> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/files/filters`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao buscar files');
-      }
-      
-      const apiResponse = await response.json();
-
-      var allFiles = []
-
-      apiResponse.data.forEach(element => {
-        allFiles.push({
-          id: element.id,
-          templateId: element.templateId,
-          userId: element.userId,
-          createdAt: element.createdAt,
-          templateName: element.templateName,
-        })
-      });
+    const apiResponse = await response.json();
+    const allFiles = apiResponse.data;
   
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
@@ -681,34 +420,20 @@ const api = {
       page,
       totalPages: Math.ceil(allFiles.length / limit)
     };
-
-    } catch (error) {
-      throw new Error('Erro ao consultar contexts');
-    }
   },
 
   async downloadGeneratedFile(fileId: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    try{
-      const response = await fetch(`${BASE_URL}/files/${fileId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.getAuthToken()
-        },
-      });
+    const response = await fetch(`${BASE_URL}/files/${fileId}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao baixar file');
-      }
-      
-      await response.json();
-
-    } catch (error) {
-      throw new Error('Erro ao baixar file');
+    if (!response.ok) {
+      throw new Error('Erro ao baixar arquivo');
     }
+    
+    await response.blob();
   }
 };
 

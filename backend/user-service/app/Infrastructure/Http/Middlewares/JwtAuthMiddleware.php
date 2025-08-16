@@ -10,12 +10,19 @@ class JwtAuthMiddleware
     public function handle($request, Closure $next)
     {
         $authHeader = $request->header('Authorization');
+        $token = null;
 
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return response()->json(['error' => 'Token ausente'], 401);
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $token = str_replace('Bearer ', '', $authHeader);
         }
 
-        $token = str_replace('Bearer ', '', $authHeader);
+        if (!$token) {
+            $token = $request->cookie('token');
+        }
+
+        if (!$token) {
+            return response()->json(['error' => 'Token ausente'], 401);
+        }
 
         $claims = app(JwtValidatorService::class)->validate($token);
 

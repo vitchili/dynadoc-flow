@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, LoginCredentials } from '@/types';
 import api from '@/services/api';
@@ -29,24 +28,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    const token = api.getAuthToken();
-    if (token) {
-      // Simular verificação de token válido
-      api.getUser('1')
-        .then(setUser)
-        .catch(() => {
-          api.setAuthToken(null);
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
+    // Tentativa de obter usuário atual (o cookie HttpOnly será enviado automaticamente)
+    api.getUser('1') // Substitua '1' pelo ID real ou endpoint que retorna "me"
+      .then(setUser)
+      .catch(() => {
+        setUser(null);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      const { user, token } = await api.login(credentials);
+      const { user } = await api.login(credentials);
       setUser(user);
       toast({
         title: "Logged In!",
