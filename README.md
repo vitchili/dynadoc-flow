@@ -1,8 +1,16 @@
 # DynaDocument
 
-If you generate PDF documents in batches using templates and only modifying the data, you probably face one of these problems: 1) you hard-code the template directly into the code, or 2) you edit each one manually in a traditional text editor.
+If you generate PDF documents in batches using templates and only modifying the data, you probably face one of these problems:
+
+1. you hard-code the template directly into the code, or
+
+2. you edit each one manually in a traditional text editor.
 
 This is DynaDocument: an open-source project for generating PDF documents using templates and dynamic tags. Admin profiles create the base structure, and third-party systems integrate via API.
+
+## Architecture
+
+![Architecture](.docker/github/arch-dyna.jpg)
 
 ## Prerequisites
 
@@ -101,7 +109,7 @@ In the root of the project, copy `.env.example` in each service, to a new file `
   - URL: http://localhost:4566
   - Description: AWS emulator (S3 enabled)
 
-## Resume of ports
+## Port Summary
 
 For all microsservices access, you must call the API by Kong API Gateway centralize, in http://localhost:8000. Example: http://localhost:8000/api/auth/login. That's the same of http://localhost:8081/api/auth/login
 
