@@ -34,7 +34,10 @@ final readonly class FindByFiltersFileHandler
             );
 
             $templateData = $apiGateway->call();
-            $outputDTO[] = $this->createFileOutput($file, $templateData->json());
+
+            if(! empty($templateData->json()['data'])) {
+                $outputDTO[] = $this->createFileOutput($file, $templateData->json());
+            }
         }
 
         return $outputDTO;
