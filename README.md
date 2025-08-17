@@ -30,6 +30,8 @@ Before running the project, make sure you have:
 
 In the root of the project, copy `.env.example` in each service, to a new file `.env`
 
+**3. Make the traditional configs of APP_KEYs**
+
 ## Services and Ports
 
 ### 🧩 APIs (Laravel Microservices)
