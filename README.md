@@ -30,7 +30,9 @@ Before running the project, make sure you have:
 
 In the root of the project, copy `.env.example` in each service, to a new file `.env`
 
-**3. Make the traditional configs of APP_KEYs**
+**3. If you're using this outside localhost, generate new public and private .pem keys, and change the APP_KEY!**
+
+For purpose of tests, it's okay to keep those .pem. In cloud, change the keys.
 
 ## Services and Ports
 
