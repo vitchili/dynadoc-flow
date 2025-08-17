@@ -37,12 +37,6 @@ const ProfilePage: React.FC = () => {
 
     try {
       setLoading(true);
-      const [companiesData] = await Promise.all([
-        api.getCompanies(user.id)
-      ]);
-      
-      setCompanies(companiesData);
-      
       // Preencher formulário com dados do usuário
       setFormData({
         email: user.email,
@@ -264,29 +258,6 @@ const ProfilePage: React.FC = () => {
               <p className="text-xs text-gray-400">
                 Deixe em branco para manter a senha atual
               </p>
-            </div>
-
-            {/* Empresa */}
-            <div className="space-y-2">
-              <Label htmlFor="company" className="flex items-center space-x-2">
-                <Building className="w-4 h-4" />
-                <span>Empresa</span>
-              </Label>
-              <Select
-                value={formData.companyId}
-                onValueChange={(value) => handleInputChange('companyId', value)}
-              >
-                <SelectTrigger className="glass bg-white/5 border-white/20">
-                  <SelectValue placeholder="Select aa empresa" />
-                </SelectTrigger>
-                <SelectContent className="glass-strong border-white/20">
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             {/* Botões */}

@@ -28,8 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Tentativa de obter usuário atual (o cookie HttpOnly será enviado automaticamente)
-    api.getUser('1') // Substitua '1' pelo ID real ou endpoint que retorna "me"
+    api.getUser('1') 
       .then(setUser)
       .catch(() => {
         setUser(null);

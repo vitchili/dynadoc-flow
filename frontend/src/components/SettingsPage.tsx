@@ -470,7 +470,7 @@ const SettingsPage: React.FC = () => {
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <Badge className={`${getTypeColor(tag.type)} border-0`}>
-                              {getTypeLabel(tag.type)}
+                              {tag.typeName}
                             </Badge>
                             <div className="flex space-x-1">
                               <Button

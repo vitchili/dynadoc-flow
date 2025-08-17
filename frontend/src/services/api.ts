@@ -367,20 +367,6 @@ const api = {
     }
   },
 
-  async getCompanies(userId: string): Promise<Company[]> {
-    const response = await fetch(`${BASE_URL}/users/${userId}/companies`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) {
-      throw new Error('Erro ao buscar empresas');
-    }
-
-    return response.json();
-  },
-
   async updateProfile(data: UpdateProfileData): Promise<User> {
     const response = await fetch(`${BASE_URL}/users/profile`, {
       method: 'PATCH',

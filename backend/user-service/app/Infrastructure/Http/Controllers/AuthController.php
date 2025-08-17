@@ -6,6 +6,7 @@ use App\Application\DTOs\AuthInputDTO;
 use App\Application\Handlers\StoreAuthHandler;
 use App\Infrastructure\Http\Requests\StoreAuthRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AuthController extends BaseController
 {
@@ -33,4 +34,12 @@ class AuthController extends BaseController
             'email' => $output->email,
         ])->cookie($cookie);
     }
+
+    public function logout(): JsonResponse
+    {
+        return response()
+        ->json(['message' => 'Logged out'])
+        ->cookie('token', '', -1);
+    }
+
 }
