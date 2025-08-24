@@ -22,7 +22,7 @@ class TemplateDeliveredConsumer extends Command
 
     public function handle(): int
     {
-        $this->info('Iniciando consumo de templates enviados após solicitação...');
+        $this->info('Initializing consumer of template delivered...');
 
         Kafka::consumer()
             ->subscribe('template.delivered')
@@ -39,7 +39,7 @@ class TemplateDeliveredConsumer extends Command
 
                 $this->fileHandler->execute($input);
 
-                echo "Mensagem recebida: " . $message  . PHP_EOL;
+                echo "Message received: " . $message  . PHP_EOL;
             })
             ->build()
             ->consume();

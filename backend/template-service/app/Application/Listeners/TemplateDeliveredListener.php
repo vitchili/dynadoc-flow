@@ -6,23 +6,34 @@ namespace App\Application\Listeners;
 
 use App\Application\Events\TemplateDeliveredEvent;
 use App\Infrastructure\Kafka\Producers\KafkaProducer;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Throwable;
 
-class TemplateDeliveredListener
-
+class TemplateDeliveredListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    public int $tries = 5;
+
+    public int $backoff = 10;
+
     public function __construct(private KafkaProducer $producer) {}
 
-    /**
-     * Handle the event.
-     */
     public function handle(TemplateDeliveredEvent $event): void
     {
-        $this->producer->send(
-            topic: 'template.delivered',
-            payload: [
-                'data' => $event->templateSectionsDTO->toArray()
-            ],
-            key: $event->templateSectionsDTO->template->id
-        );
+        try {
+            $this->producer->send(
+                topic: 'template.delivered',
+                payload: [
+                    'data' => $event->templateSectionsDTO->toArray()
+                ],
+                key: $event->templateSectionsDTO->template->id
+            );
+        } catch (Throwable $e) {
+            $this->release($this->backoff);
+
+            throw $e;
+        }
     }
 }

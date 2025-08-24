@@ -20,6 +20,8 @@ class TemplateRequestedConsumer extends Command
 
     public function handle(): int
     {
+        $this->info('Initializing consumer of template requested...');
+
         Kafka::consumer()
             ->subscribe('template.requested')
             ->withHandler(function (ConsumedMessage $message) {
