@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     libicu-dev libprotobuf-dev protobuf-compiler \
     && pecl install rdkafka \
     && docker-php-ext-enable rdkafka \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
     && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

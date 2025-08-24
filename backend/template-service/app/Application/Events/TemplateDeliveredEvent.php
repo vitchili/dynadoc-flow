@@ -8,14 +8,17 @@ use App\Application\DTOs\TemplateSectionsOutputDTO;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class TemplateDeliveredEvent
+class TemplateDeliveredEvent implements ShouldQueue
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, InteractsWithQueue, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
+    public int $tries = 5;
+
+    public int $backoff = 10;
+
     public function __construct(public TemplateSectionsOutputDTO $templateSectionsDTO)
     {
     }
