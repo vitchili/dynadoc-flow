@@ -228,6 +228,8 @@ services:
       - "8443:8443" # proxy (https)
       - "8001:8001" # admin API (http)
       - "8444:8444" # admin API (https)
+    volumes:
+      - ./.docker/kong/jwt-public.pem:/etc/kong/jwt-public.pem:ro
     networks:
       - laravel-net
     command: >
@@ -243,6 +245,7 @@ services:
     command: /kong-init.sh
     volumes:
       - ./.docker/kong/kong-init.sh:/kong-init.sh
+      - ./.docker/kong/jwt-public.pem:/jwt-public.pem:ro
     depends_on:
       - kong
       - user-nginx
