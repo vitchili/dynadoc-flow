@@ -4,10 +4,10 @@ use App\Infrastructure\Http\Controllers\ContextController;
 use App\Infrastructure\Http\Controllers\SectionController;
 use App\Infrastructure\Http\Controllers\TagController;
 use App\Infrastructure\Http\Controllers\TemplateController;
-use App\Infrastructure\Http\Middlewares\JwtAuthMiddleware;
+use App\Infrastructure\Http\Middlewares\JwtDecodingMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(JwtAuthMiddleware::class)->group(function () {
+Route::middleware(JwtDecodingMiddleware::class)->group(function () {
     Route::prefix('contexts')->controller(ContextController::class)->group(function () {
         Route::get('/filters', 'findByFilters');
         Route::post('/', 'store');

@@ -6,9 +6,9 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Exception;
 
-class JwtValidatorService
+class JwtDecoderService
 {
-    public function validate(string $token): ?array
+    public function decode(string $token): ?array
     {
         try {
             $publicKey = file_get_contents(base_path(env('JWT_PUBLIC_KEY_PATH')));
