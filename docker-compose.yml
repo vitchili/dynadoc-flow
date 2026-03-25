@@ -64,41 +64,21 @@ services:
     networks:
       - laravel-net
 
-  user-nginx:
+  nginx:
     image: nginx:alpine
-    container_name: user-nginx
+    container_name: nginx
     ports:
-      - "8081:80"
+      - "8080:80"
     volumes:
-      - ./backend/user-service:/var/www/html
-      - ./.docker/nginx/user.conf:/etc/nginx/conf.d/default.conf
+      - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./backend/user-service:/var/www/user
+      - ./backend/template-service:/var/www/template
+      - ./backend/file-service:/var/www/file
+      - ./.docker/nginx/sites-available:/etc/nginx/sites-available
+      - ./.docker/nginx/sites-enabled:/etc/nginx/sites-enabled
     depends_on:
       - user-app
-    networks:
-      - laravel-net
-
-  template-nginx:
-    image: nginx:alpine
-    container_name: template-nginx
-    ports:
-      - "8082:80"
-    volumes:
-      - ./backend/template-service:/var/www/html
-      - ./.docker/nginx/template.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
       - template-app
-    networks:
-      - laravel-net
-
-  file-nginx:
-    image: nginx:alpine
-    container_name: file-nginx
-    ports:
-      - "8083:80"
-    volumes:
-      - ./backend/file-service:/var/www/html
-      - ./.docker/nginx/file.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
       - file-app
     networks:
       - laravel-net
@@ -248,7 +228,7 @@ services:
       - ./.docker/kong/jwt-public.pem:/jwt-public.pem:ro
     depends_on:
       - kong
-      - user-nginx
+      - nginx
     networks:
       - laravel-net
     restart: on-failure

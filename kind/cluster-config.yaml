@@ -1,0 +1,50 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+name: dynadoc-cluster
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+      - containerPort: 30001
+        hostPort: 30001
+        protocol: TCP
+      - containerPort: 30002
+        hostPort: 30002
+        protocol: TCP
+      - containerPort: 30003
+        hostPort: 30003
+        protocol: TCP
+      - containerPort: 30004
+        hostPort: 30004
+        protocol: TCP
+      - containerPort: 30005
+        hostPort: 30005
+        protocol: TCP
+      - containerPort: 30006
+        hostPort: 30006
+        protocol: TCP
+      - containerPort: 30007
+        hostPort: 30007
+        protocol: TCP
+      - containerPort: 30008
+        hostPort: 30008
+        protocol: TCP
+      - containerPort: 30009
+        hostPort: 30009
+        protocol: TCP
+  - role: worker
+  - role: worker

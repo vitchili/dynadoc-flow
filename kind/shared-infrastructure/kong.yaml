@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kong-db-secret
+  namespace: shared-infrastructure
+type: Opaque
+data:
+  postgres-password: a29uZw== # kong
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kong-db-pvc
+  namespace: shared-infrastructure
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong-db
+  namespace: shared-infrastructure
+  labels:
+    app: kong-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong-db
+  template:
+    metadata:
+      labels:
+        app: kong-db
+    spec:
+      containers:
+        - name: kong-db
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "kong"
+            - name: POSTGRES_USER
+              value: "kong"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-db-secret
+                  key: postgres-password
+          volumeMounts:
+            - name: kong-db-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: kong-db-storage
+          persistentVolumeClaim:
+            claimName: kong-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-db-service
+  namespace: shared-infrastructure
+  labels:
+    app: kong-db
+spec:
+  selector:
+    app: kong-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  namespace: shared-infrastructure
+  labels:
+    app: kong
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong
+          image: kong:3.6
+          ports:
+            - containerPort: 8000
+            - containerPort: 8001
+          env:
+            - name: KONG_DATABASE
+              value: "postgres"
+            - name: KONG_PG_HOST
+              value: "kong-db-service.shared-infrastructure.svc.cluster.local"
+            - name: KONG_PG_DATABASE
+              value: "kong"
+            - name: KONG_PG_USER
+              value: "kong"
+            - name: KONG_PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kong-db-secret
+                  key: postgres-password
+            - name: KONG_PROXY_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: "/dev/stdout"
+            - name: KONG_PROXY_ERROR_LOG
+              value: "/dev/stderr"
+            - name: KONG_ADMIN_ERROR_LOG
+              value: "/dev/stderr"
+            - name: KONG_ADMIN_LISTEN
+              value: "0.0.0.0:8001"
+          command:
+            - sh
+            - -c
+            - |
+              kong migrations bootstrap ||
+              (kong migrations up && kong migrations finish) &&
+              kong start --vv
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.35
+          command:
+            [
+              "sh",
+              "-c",
+              "until nc -z kong-db-service.shared-infrastructure.svc.cluster.local 5432; do echo waiting for kong-db; sleep 2; done;",
+            ]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-service
+  namespace: shared-infrastructure
+  labels:
+    app: kong
+spec:
+  selector:
+    app: kong
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: proxy
+    - port: 8001
+      targetPort: 8001
+      name: admin
+  type: ClusterIP

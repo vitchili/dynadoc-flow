@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-scripts
+  namespace: shared-infrastructure
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS user_service;
+    CREATE DATABASE IF NOT EXISTS template_service;
+    CREATE DATABASE IF NOT EXISTS file_service;
+
+    CREATE USER IF NOT EXISTS 'dynadoc_user'@'%' IDENTIFIED BY 'dynadoc_password';
+    GRANT ALL PRIVILEGES ON user_service.* TO 'dynadoc_user'@'%';
+    GRANT ALL PRIVILEGES ON template_service.* TO 'dynadoc_user'@'%';
+    GRANT ALL PRIVILEGES ON file_service.* TO 'dynadoc_user'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+  namespace: shared-infrastructure
+type: Opaque
+data:
+  root-password: cm9vdA== # root
+  user-password: ZHluYWRvY19wYXNzd29yZA== # dynadoc_password
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: shared-infrastructure
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: shared-infrastructure
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: root-password
+            - name: MYSQL_DATABASE
+              value: "dynadoc"
+            - name: MYSQL_USER
+              value: "dynadoc_user"
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: user-password
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: mysql-init-scripts
+          configMap:
+            name: mysql-init-scripts
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: shared-infrastructure
+  labels:
+    app: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql
+  type: ClusterIP

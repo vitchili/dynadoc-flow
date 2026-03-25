@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: dynadoc-system
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        keepalive_timeout  65;
+
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+
+        # Upstream definitions
+        upstream user_service {
+            server user-service.user-service.svc.cluster.local:9000;
+        }
+
+        upstream template_service {
+            server template-service.template-service.svc.cluster.local:9000;
+        }
+
+        upstream file_service {
+            server file-service.file-service.svc.cluster.local:9000;
+        }
+
+        upstream frontend_service {
+            server frontend-service.dynadoc-system.svc.cluster.local:5173;
+        }
+
+        # Main server block
+        server {
+            listen 80;
+            server_name localhost;
+
+            # Security headers
+            add_header X-Frame-Options DENY;
+            add_header X-Content-Type-Options nosniff;
+            add_header X-XSS-Protection "1; mode=block";
+
+            # User service
+            location /user/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                alias /var/www/user/public/;
+                index index.php index.html;
+
+                try_files $uri $uri/ /index.php?$query_string;
+
+                location ~ \.php$ {
+                    fastcgi_pass user_service;
+                    fastcgi_param SCRIPT_FILENAME $request_filename;
+                    include fastcgi_params;
+                    fastcgi_param HTTP_HOST $host;
+                    fastcgi_param HTTPS off;
+                }
+            }
+
+            # Template service
+            location /template/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                alias /var/www/template/public/;
+                index index.php index.html;
+
+                try_files $uri $uri/ /index.php?$query_string;
+
+                location ~ \.php$ {
+                    fastcgi_pass template_service;
+                    fastcgi_param SCRIPT_FILENAME $request_filename;
+                    include fastcgi_params;
+                    fastcgi_param HTTP_HOST $host;
+                    fastcgi_param HTTPS off;
+                }
+            }
+
+            # File service
+            location /file/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                alias /var/www/file/public/;
+                index index.php index.html;
+
+                try_files $uri $uri/ /index.php?$query_string;
+
+                location ~ \.php$ {
+                    fastcgi_pass file_service;
+                    fastcgi_param SCRIPT_FILENAME $request_filename;
+                    include fastcgi_params;
+                    fastcgi_param HTTP_HOST $host;
+                    fastcgi_param HTTPS off;
+                }
+            }
+
+            # Frontend
+            location / {
+                proxy_pass http://frontend_service;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            # Health check endpoint
+            location /health {
+                access_log off;
+                return 200 "healthy\n";
+                add_header Content-Type text/plain;
+            }
+        }
+    }

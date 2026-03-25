@@ -8,28 +8,28 @@ echo "Registrando serviços e rotas no Kong..."
 # USER SERVICE
 curl -s -X POST http://kong:8001/services \
   --data name=user-service \
-  --data url=http://user-nginx:80
+  --data url=http://nginx:80/user
 
 curl -s -X POST http://kong:8001/services/user-service/routes \
   --data 'paths[]=/api/auth/login' \
-  --data 'strip_path=false'
+  --data 'strip_path=true'
 
 # TEMPLATE SERVICE
 curl -s -X POST http://kong:8001/services \
   --data name=template-service \
-  --data url=http://template-nginx:80
+  --data url=http://nginx:80/template
 
 curl -s -X POST http://kong:8001/services/template-service/routes \
   --data 'paths[]=/api/contexts' \
   --data 'paths[]=/api/tags' \
   --data 'paths[]=/api/templates' \
   --data 'paths[]=/api/sections' \
-  --data 'strip_path=false'
+  --data 'strip_path=true'
 
 # FILE SERVICE
 curl -s -X POST http://kong:8001/services \
   --data name=file-service \
-  --data url=http://file-nginx:80
+  --data url=http://nginx:80/file
 
 curl -s -X POST http://kong:8001/services/file-service/routes \
   --data 'paths[]=/api/files' \
