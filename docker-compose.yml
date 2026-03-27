@@ -219,6 +219,39 @@ services:
         kong start --vv
       "
 
+  konga-db:
+    image: postgres:11
+    container_name: konga-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: konga
+      POSTGRES_USER: konga
+      POSTGRES_PASSWORD: konga
+    volumes:
+      - konga-db-data:/var/lib/postgresql/data
+    networks:
+      - laravel-net
+
+  konga:
+    image: pantsel/konga:0.14.9
+    platform: linux/amd64
+    container_name: konga
+    depends_on:
+      - kong
+    environment:
+      DB_ADAPTER: postgres
+      DB_HOST: konga-db
+      DB_PORT: 5432
+      DB_USER: konga
+      DB_PASSWORD: konga
+      DB_DATABASE: konga
+      DB_MIGRATE: auto
+      NODE_ENV: development
+    ports:
+      - "1337:1337"
+    networks:
+      - laravel-net
+
   kong-initializer:
     image: curlimages/curl:7.83.1
     container_name: kong-init
@@ -272,3 +305,4 @@ networks:
 
 volumes:
   kong-db-data:
+  konga-db-data:
