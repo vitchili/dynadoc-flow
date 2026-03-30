@@ -1,9 +1,9 @@
 #!/bin/sh
 
-echo "Aguardando o Kong iniciar..."
+echo "Initializing Kong..."
 sleep 10
 
-echo "Registrando serviços e rotas no Kong..."
+echo "Registering services and routes..."
 
 # USER SERVICE
 curl -s -X POST http://kong:8001/services \
@@ -35,7 +35,7 @@ curl -s -X POST http://kong:8001/services/file-service/routes \
   --data 'paths[]=/api/files' \
   --data 'strip_path=false'
 
-echo "Criando consumer e configurando JWT..."
+echo "Creating consumer and config JWT..."
 
 curl -s -X POST http://kong:8001/consumers \
   --data "username=user-service"
@@ -47,7 +47,7 @@ curl -s -X POST http://kong:8001/consumers/user-service/jwt \
   --data-urlencode "rsa_public_key=$PUB_KEY" \
   --data "key=user-service"
 
-# Ativar JWT no template-service
+# Activate JWT on template-service
 curl -s -X POST http://kong:8001/services/template-service/plugins \
   --data "name=jwt" \
   --data "config.key_claim_name=iss" \
@@ -59,7 +59,7 @@ curl -s -X POST http://kong:8001/services/template-service/plugins \
   --data "config.add.headers[]=X-User-Id:\$jwt.claims.userId" \
   --data "config.add.headers[]=X-User-Email:\$jwt.claims.email"
 
-# Ativar JWT no file-service
+# Activate JWT on file-service
 curl -s -X POST http://kong:8001/services/file-service/plugins \
   --data "name=jwt" \
   --data "config.key_claim_name=iss" \
@@ -71,4 +71,4 @@ curl -s -X POST http://kong:8001/services/file-service/plugins \
   --data "config.add.headers[]=X-User-Id:\$jwt.claims.userId" \
   --data "config.add.headers[]=X-User-Email:\$jwt.claims.email"
 
-echo "Configuração concluída!"
+echo "Config finished!"
