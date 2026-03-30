@@ -35,40 +35,32 @@ curl -s -X POST http://kong:8001/services/file-service/routes \
   --data 'paths[]=/api/files' \
   --data 'strip_path=false'
 
-echo "Creating consumer and config JWT..."
+echo "Creating consumer and JWT credential..."
 
 curl -s -X POST http://kong:8001/consumers \
   --data "username=user-service"
 
-PUB_KEY=$(cat ./jwt-public.pem)
+PUB_KEY=$(cat /jwt-public.pem)
 
 curl -s -X POST http://kong:8001/consumers/user-service/jwt \
   --data "algorithm=RS256" \
   --data-urlencode "rsa_public_key=$PUB_KEY" \
   --data "key=user-service"
 
-# Activate JWT on template-service
+# JWT plugin no template-service
 curl -s -X POST http://kong:8001/services/template-service/plugins \
   --data "name=jwt" \
   --data "config.key_claim_name=iss" \
   --data "config.claims_to_verify=exp" \
-  --data "config.run_on_preflight=false"
+  --data "config.run_on_preflight=false" \
+  --data "config.cookie_names=token"
 
-curl -s -X POST http://kong:8001/services/template-service/plugins \
-  --data "name=request-transformer" \
-  --data "config.add.headers[]=X-User-Id:\$jwt.claims.userId" \
-  --data "config.add.headers[]=X-User-Email:\$jwt.claims.email"
-
-# Activate JWT on file-service
+# JWT plugin no file-service
 curl -s -X POST http://kong:8001/services/file-service/plugins \
   --data "name=jwt" \
   --data "config.key_claim_name=iss" \
   --data "config.claims_to_verify=exp" \
-  --data "config.run_on_preflight=false"
-
-curl -s -X POST http://kong:8001/services/file-service/plugins \
-  --data "name=request-transformer" \
-  --data "config.add.headers[]=X-User-Id:\$jwt.claims.userId" \
-  --data "config.add.headers[]=X-User-Email:\$jwt.claims.email"
+  --data "config.run_on_preflight=false" \
+  --data "config.cookie_names=token"
 
 echo "Config finished!"
