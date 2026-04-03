@@ -204,10 +204,10 @@ services:
       KONG_ADMIN_ERROR_LOG: /dev/stderr
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     ports:
-      - "8000:8000" # proxy (http)
-      - "8443:8443" # proxy (https)
-      - "8001:8001" # admin API (http)
-      - "8444:8444" # admin API (https)
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
     volumes:
       - ./.docker/kong/jwt-public.pem:/etc/kong/jwt-public.pem:ro
     networks:
@@ -218,6 +218,12 @@ services:
         (kong migrations up && kong migrations finish) &&
         kong start --vv
       "
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
 
   konga-db:
     image: postgres:11
